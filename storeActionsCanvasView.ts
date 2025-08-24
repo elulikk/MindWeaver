@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { MindMapState, Point, CanvasObject, CanvasObjectShape, CanvasObjectLine, CanvasObjectText, CanvasObjectResizeHandle } from './types';
 import { getCoreState } from './storeUtils';
@@ -11,6 +10,17 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
     handleMouseMove: (e: React.MouseEvent<HTMLElement>, newMousePosition: Point) => {
         const { isPanning, panStart, viewOffset, zoom, dragInfo, resizeInfo, nodes, isSelecting, selectionStart, drawingObject, canvasObjectDragInfo, canvasObjects, selectedCanvasObjectIds } = get();
     
+        if (isPanning) {
+            const dx = newMousePosition.x - panStart.x;
+            const dy = newMousePosition.y - panStart.y;
+            set({
+                mousePosition: newMousePosition,
+                viewOffset: { x: viewOffset.x + dx, y: viewOffset.y + dy },
+                panStart: newMousePosition,
+            });
+            return;
+        }
+
         if (canvasObjectDragInfo) {
             const dx = (newMousePosition.x - canvasObjectDragInfo.startMousePos.x) / zoom;
             const dy = (newMousePosition.y - canvasObjectDragInfo.startMousePos.y) / zoom;
@@ -153,17 +163,6 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
             return;
         }
 
-        if (isPanning) {
-            const dx = newMousePosition.x - panStart.x;
-            const dy = newMousePosition.y - panStart.y;
-            set({
-                mousePosition: newMousePosition,
-                viewOffset: { x: viewOffset.x + dx, y: viewOffset.y + dy },
-                panStart: newMousePosition,
-            });
-            return;
-        }
-
         if (dragInfo.isDragging) {
             const dx = (newMousePosition.x - dragInfo.startPos.x) / zoom;
             const dy = (newMousePosition.y - dragInfo.startPos.y) / zoom;
@@ -224,6 +223,13 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
         const { drawingMode, mousePosition, zoom, viewOffset, actions, canvasObjects, selectedCanvasObjectIds, canvasObjectsById } = get();
         actions.closeContextMenu();
     
+        // Pan with middle mouse button or Ctrl+left-click should always work
+        if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
+            set({ isPanning: true, panStart: get().mousePosition });
+            e.preventDefault();
+            return; // Early return to ensure panning takes precedence
+        }
+        
         if (drawingMode) {
             e.stopPropagation(); // Stop propagation for all drawing modes
     
@@ -331,13 +337,8 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
             return; // Return after handling drawing mode logic
         }
     
-        // Pan with middle mouse button or Ctrl+left-click
-        if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
-            set({ isPanning: true, panStart: get().mousePosition });
-            e.preventDefault();
-        } 
         // Left-click on canvas background starts selection box
-        else if (e.button === 0) {
+        if (e.button === 0) {
             set({ 
                 isSelecting: true, 
                 selectionStart: get().mousePosition, 
@@ -541,6 +542,7 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
     },
     setMainSize: (size: { width: number, height: number }) => set({ mainSize: size }),
     nodeMouseDown: (nodeId: number, e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return; // Only allow left-click to drag nodes
         if (get().drawingMode) return;
         const { nodes, selectedNodeIds, mininodes } = get();
         const node = nodes.find(n => n.id === nodeId);

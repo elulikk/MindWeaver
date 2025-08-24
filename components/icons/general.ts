@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 
 export const generalIcons = {
@@ -64,8 +62,11 @@ export const generalIcons = {
   'pin-off': React.createElement('path', { d: "M16.5 3.75L12 8.25l-4.5-4.5L6 5.25l4.5 4.5-2.25 2.25L5.25 15 9 18.75l3-3 3 3 3.75-3.75-3-3 2.25-2.25 4.5-4.5-1.5-1.5z" }),
   'chevron-left': React.createElement('path', { d: "M15.75 19.5L8.25 12l7.5-7.5" }),
   'chevron-right': React.createElement('path', { d: "M8.25 4.5l7.5 7.5-7.5 7.5" }),
+  'chevron-up': React.createElement('path', { d: "M4.5 15.75l7.5-7.5 7.5 7.5" }),
+  'chevron-down': React.createElement('path', { d: "M19.5 8.25l-7.5 7.5-7.5-7.5" }),
   chatbot: React.createElement(React.Fragment, null, React.createElement('path', { d: "M16.5 3.75L12 8.25l-4.5-4.5L6 5.25l4.5 4.5-2.25 2.25L5.25 15 9 18.75l3-3 3 3 3.75-3.75-3-3 2.25-2.25 4.5-4.5-1.5-1.5z" }), React.createElement('path', { d: "M19.5 9.75L21.75 12l-2.25 2.25" }), React.createElement('path', { d: "M4.5 9.75L2.25 12l2.25 2.25" })),
   'mark-all-incomplete': React.createElement('path', { d: "M12 21a9 9 0 100-18 9 9 0 000 18z" }),
   wifi: React.createElement('path', { d: "M4.11 9.17a12 12 0 0115.78 0M5.83 10.9a8 8 0 0112.34 0M8.25 13.32a4 4 0 017.5 0M12 18h.01" }),
   filter: React.createElement('path', { d: "M3 4.5h14.25M6.21 9.75H12m-3.99 5.25h1.38" }),
+  star: React.createElement('path', { d: "M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007z", fillRule: "evenodd" }),
 };

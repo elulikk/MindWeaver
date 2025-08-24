@@ -1,7 +1,5 @@
 
-
-
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState, useMemo, useLayoutEffect } from 'react';
 import { useMindMapStore } from './store';
 import NodeComponent from './components/NodeComponent';
 import EditNodeModal from './components/EditNodeModal';
@@ -30,12 +28,13 @@ import { useTranslations } from './components/locales/i18n';
 
 const VIRTUAL_CANVAS_SIZE = 10000;
 const PORT_OFFSET = 8;
-const APP_VERSION = '1.15.5';
+const APP_VERSION = '1.15.6';
 
 const ContextMenu = () => {
     const t = useTranslations();
     const { contextMenu, actions, selectedNodeIds, connectingInfo, canvasObjectsById } = useMindMapStore();
     const menuRef = useRef<HTMLDivElement>(null);
+    const [adjustedPosition, setAdjustedPosition] = useState<{x: number, y: number} | null>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -51,9 +50,32 @@ const ContextMenu = () => {
         };
     }, [contextMenu, actions]);
 
+    // Use layout effect to prevent flicker by calculating position before paint
+    useLayoutEffect(() => {
+        if (contextMenu && menuRef.current) {
+            const { x, y } = contextMenu;
+            const { offsetWidth, offsetHeight } = menuRef.current;
+            const { innerWidth, innerHeight } = window;
+            
+            let newX = x;
+            let newY = y;
+
+            if (x + offsetWidth > innerWidth) {
+                newX = innerWidth - offsetWidth - 5; // 5px buffer
+            }
+            if (y + offsetHeight > innerHeight) {
+                newY = innerHeight - offsetHeight - 5; // 5px buffer
+            }
+            setAdjustedPosition({ x: newX, y: newY });
+        } else {
+            setAdjustedPosition(null);
+        }
+    }, [contextMenu]);
+
     if (!contextMenu) return null;
 
-    const { x, y, type } = contextMenu;
+    const { type } = contextMenu;
+    const finalPosition = adjustedPosition || { x: contextMenu.x, y: contextMenu.y };
 
     const MenuItem: React.FC<{ onClick: () => void; icon: IconName; label: string; disabled?: boolean; destructive?: boolean }> = ({ onClick, icon, label, disabled, destructive }) => (
         <button
@@ -111,7 +133,7 @@ const ContextMenu = () => {
                 const isMultiSelect = selectedNodeIds.size > 1;
                 return (
                     <>
-                       {!isMultiSelect && <MenuItem onClick={() => actions.openModal({ type: 'edit', node })} icon="settings" label={t('contextMenu.editNode')} />}
+                       {!isMultiSelect && <MenuItem onClick={() => actions.openModal({ type: 'edit', node })} icon="abrir-local" label={t('contextMenu.openNode')} />}
                        {!isMultiSelect && <MenuItem onClick={() => actions.addMininode(targetId)} icon="add" label={t('contextMenu.addMininode')} />}
                        {!isMultiSelect && <MenuItem 
                             onClick={() => actions.toggleNodePin(targetId)} 
@@ -184,7 +206,11 @@ const ContextMenu = () => {
     return (
         <div
             ref={menuRef}
-            style={{ top: `${y}px`, left: `${x}px` }}
+            style={{ 
+                top: `${finalPosition.y}px`, 
+                left: `${finalPosition.x}px`,
+                visibility: adjustedPosition ? 'visible' : 'hidden' 
+            }}
             className="fixed z-[100] min-w-max bg-zinc-800 border border-zinc-600 text-zinc-200 rounded-lg shadow-2xl p-2 animate-fade-in-fast"
             onContextMenu={(e) => e.preventDefault()}
         >

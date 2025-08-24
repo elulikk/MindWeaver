@@ -101,7 +101,7 @@ export default {
         paste: 'Pegar',
         frameAll: 'Encuadrar Todo',
         // Node
-        editNode: 'Editar Nodo',
+        openNode: 'Abrir Nodo',
         addMininode: 'Añadir Diente',
         pinNode: 'Anclar Nodo',
         unpinNode: 'Desanclar Nodo',

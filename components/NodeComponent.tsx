@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Node, Mininode, DrawingTool } from '../types';
 import { useMindMapStore } from '../store';
@@ -83,7 +82,7 @@ const ResizeHandle: React.FC<{
     title: string;
 }> = ({ onMouseDown, className, title }) => (
     <div
-        className={`absolute w-3 h-3 bg-white border-2 border-cyan-500 rounded-sm z-20 hover:bg-cyan-200 transition-colors ${className}`}
+        className={`absolute w-3 h-3 bg-white border-2 border-cyan-500 rounded-sm z-20 hover:bg-cyan-200 transition-colors pointer-events-auto ${className}`}
         onMouseDown={onMouseDown}
         title={title}
     />
@@ -121,20 +120,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     draggedMininodeInfo: state.draggedMininodeInfo,
   }));
   const [activeMininodeId, setActiveMininodeId] = useState<number | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
 
-
-  const handleGenerateSynthesis = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!node.description?.trim()) {
-        actions._addLog('No hay descripción para generar una síntesis.', 'warning');
-        return;
-    }
-    setIsGenerating(true);
-    await actions.generateNodeSynthesis(node.id);
-    setIsGenerating(false);
-  };
-
+  const isCompactView = node.size.width < 215 || node.size.height < 105;
 
   useEffect(() => {
     if (activeMininodeId && !mininodes.some(mn => mn.id === activeMininodeId)) {
@@ -235,35 +222,19 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     actions.openContextMenu({ type: 'node', targetId: node.id, x: e.clientX, y: e.clientY });
   };
 
-  const SynthesisContent = (
-    <div className="w-full h-full relative flex items-center justify-center p-1">
-      {isGenerating && (
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-md z-10">
-          <div className="w-6 h-6 border-2 border-dashed rounded-full animate-spin border-white"></div>
-        </div>
-      )}
-      {node.synthesis && (
-        <p className="text-xs text-center italic" style={{ color: textColor, opacity: 0.8 }}>
-          {node.synthesis.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
-        </p>
-      )}
-      {!node.synthesis && node.description?.trim() && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <button
-            onClick={handleGenerateSynthesis}
-            disabled={isGenerating}
-            title="Generar un resumen con IA de la descripción del nodo"
-            className="opacity-0 group-hover:opacity-100 disabled:opacity-50 transition-all bg-cyan-600/80 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-2"
-          >
-            <Icon icon="brain" className="w-4 h-4" />
-            Generar Síntesis
-          </button>
-        </div>
-      )}
+  const isFaded = focusModeEnabled && (!isInputConditionMet || node.isComplete);
+
+  const Checkbox = (
+    <div className="flex-shrink-0 flex items-center justify-center p-1 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={node.isComplete}
+        onChange={(e) => { e.stopPropagation(); onToggleComplete(node.id); }}
+        className="w-4 h-4 rounded-sm"
+        onMouseDown={(e) => e.stopPropagation()}
+      />
     </div>
   );
-
-  const isFaded = focusModeEnabled && (!isInputConditionMet || node.isComplete);
 
   return (
     <div
@@ -280,7 +251,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         
         {/* Node Body */}
         <div 
-            className={`relative flex flex-col transition-all duration-200 ${hasMininodes ? 'border-b-0' : ''}`}
+            className={`relative flex flex-col justify-between transition-all duration-200 ${hasMininodes ? 'border-b-0' : ''} ${node.isPinned ? '' : 'active:cursor-grabbing'}`}
             style={{ 
                 backgroundColor: node.color, 
                 borderColor: borderColor, 
@@ -290,6 +261,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                 ...shapeStyles, 
                 height: `${node.size.height}px`, 
                 width: `${node.size.width}px`,
+                cursor: node.isPinned ? 'default' : 'grab',
             }}
             onDragOver={(e) => {
                 if (isDropTarget) {
@@ -303,6 +275,12 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                     actions.moveMininode(draggedMininodeInfo.id, node.id);
                     actions.setDraggedMininodeInfo(null);
                 }
+            }}
+            onMouseDown={(e) => {
+                if ((e.target as HTMLElement).closest('button, input, .connection-port')) {
+                    return;
+                }
+                onNodeMouseDown(node.id, e);
             }}
         >
              {/* Action Buttons (moved inside) */}
@@ -326,202 +304,105 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                 <button disabled={!!drawingMode} onClick={(e) => { e.stopPropagation(); onDelete(node.id); }} aria-label="Eliminar nodo" className="delete-button w-5 h-5 rounded-full flex items-center justify-center bg-zinc-600/50 text-white opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:bg-red-500 transition-all duration-200 focus:outline-none disabled:opacity-0" ><Icon icon="delete" className="w-3 h-3" /></button>
             </div>
             <div 
-                className={`relative w-full p-2 text-center transition-colors bg-white/5 border-b border-white/10 ${node.isPinned ? '' : 'active:cursor-grabbing'}`}
-                style={{ color: textColor, cursor: node.isPinned ? 'default' : 'grab' }}
-                onMouseDown={(e) => { onNodeMouseDown(node.id, e); }}
+                className="relative w-full p-2 flex items-center justify-between gap-2 transition-colors bg-white/5 border-b border-white/10"
+                style={{ color: textColor }}
             >
-                <div className="flex items-center justify-center gap-2">
+                {checkboxPosition === 'left' ? Checkbox : <div className="w-5 flex-shrink-0"/>}
+                
+                <div className="flex-grow flex items-center justify-center gap-2 min-w-0">
                     {node.icon && <Icon icon={node.icon} className="w-4 h-4 flex-shrink-0" style={{ color: node.iconColor }} />}
-                    <h3 className="font-bold text-base break-words select-none" title={node.title}>{node.title}</h3>
+                    <h2 className="text-sm font-bold truncate" style={{ color: textColor }}>{node.title}</h2>
+                    {isLogicInput && !(node.icon === 'node-and' || node.icon === 'node-or') && (
+                      <span className="text-xs font-mono px-1.5 py-0.5 rounded-full bg-black/20 flex-shrink-0" style={{ color: textColor }}>{node.inputLogic}</span>
+                    )}
                 </div>
+
+                {checkboxPosition === 'right' ? Checkbox : <div className="w-5 flex-shrink-0"/>}
             </div>
-             <div className="flex-grow flex flex-col p-2 justify-between min-h-0">
-                <div className="flex-grow flex flex-row items-stretch justify-center relative min-h-0">
-                  {isLogicInput ? (
-                      <>
-                        {!node.icon && (
-                          <div className="w-1/3 flex items-center justify-center p-1 border-r border-white/20">
-                              <span className="font-bold text-2xl" style={{ color: textColor, opacity: 0.8 }}>{node.inputLogic}</span>
-                          </div>
-                        )}
-                        <div className={!node.icon ? "w-2/3" : "w-full"}>
-                            {SynthesisContent}
-                        </div>
-                      </>
-                  ) : (
-                      <div className="w-full">
-                          {SynthesisContent}
-                      </div>
-                  )}
-                </div>
-                <div className="flex-shrink-0 flex items-center justify-center gap-2 pt-2">
-                    {node.difficulty > 0 && (
-                        <div className="flex items-center gap-0.5" title={`Dificultad: ${node.difficulty} de 10`}>
+            
+            <div className="flex-grow flex flex-col justify-end px-2 pb-2 text-xs" style={{ color: textColor }}>
+                <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center gap-1">
+                        {isInputConditionMet && !node.isComplete && <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>}
+                    </div>
+                    {!isCompactView && (
+                        <div className={`flex items-center gap-0.5 star-difficulty`}>
                             {[...Array(10)].map((_, i) => (
-                                <svg key={i + 1} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`star-difficulty w-3 h-3 transition-colors ${(i + 1) <= node.difficulty ? getDifficultyColor(node.difficulty) : (isDarkNode ? 'text-zinc-500' : 'text-zinc-300')}`}>
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" stroke="rgba(0,0,0,0.5)" strokeWidth="1.2" strokeLinejoin="round" />
-                                </svg>
+                                <Icon
+                                    key={i}
+                                    icon="star"
+                                    className={`w-2.5 h-2.5 transition-colors ${i < node.difficulty ? getDifficultyColor(node.difficulty) : 'text-zinc-600'}`}
+                                />
                             ))}
                         </div>
                     )}
-                    {(node.difficulty > 0 && node.time > 0) && <div className="w-px h-3 bg-white/20" />}
-                    {node.time > 0 && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: textColor, opacity: 0.8 }} title={`Tiempo estimado: ${node.time} min`}>
-                            <Icon icon="time" className="w-3 h-3" />
-                            <span>{node.time} min</span>
-                        </div>
-                    )}
                 </div>
-            </div>
-            
-            <div 
-                aria-label={node.isComplete ? 'Marcar como incompleto' : 'Marcar como completo'} 
-                title={node.isComplete ? 'Marcar como incompleto' : 'Marcar como completo'}
-                className={`absolute bottom-2 z-20 ${checkboxPosition === 'left' ? 'left-2' : 'right-2'}`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="switch-toggle-wrapper">
-                    <input 
-                        type="checkbox" 
-                        id={`switch-${node.id}`} 
-                        className="switch-toggle-checkbox"
-                        checked={node.isComplete}
-                        onChange={() => onToggleComplete(node.id)}
-                        disabled={!!drawingMode}
-                    />
-                    <label htmlFor={`switch-${node.id}`} className="switch-toggle-label">
-                        <span className="switch-toggle-switch"></span>
-                    </label>
-                </div>
+                {!isCompactView && node.time ? (
+                    <div className="self-end opacity-70 whitespace-nowrap mt-1">
+                        ({node.time} min)
+                    </div>
+                ) : null}
             </div>
 
+
+             {/* Ports */}
+            <div>
+                {node.inputs.map((port, index) => (
+                    <div key={port.id} className="connection-port absolute -left-[8px]" style={{ top: `${getPortY(index, node.inputs.length, node.size.height)}px`, transform: 'translateY(-50%)' }} onMouseDown={(e) => e.stopPropagation()} onMouseUp={(e) => { e.stopPropagation(); onConnectEnd(node.id, port.id); }}>
+                       <div className={`w-4 h-4 rounded-full border-2 bg-zinc-900 transition-all ${activeInputs.has(port.id) ? 'border-cyan-400' : isConnecting ? 'border-zinc-200 hover:border-cyan-400 hover:bg-cyan-900' : 'border-zinc-500'}`} />
+                    </div>
+                ))}
+                {node.outputs.map((port, index) => (
+                    <div key={port.id} className="connection-port absolute -right-[8px]" style={{ top: `${getPortY(index, node.outputs.length, node.size.height)}px`, transform: 'translateY(-50%)' }} onMouseDown={(e) => { e.stopPropagation(); onConnectStart(node.id, port.id); }}>
+                       <div className={`w-4 h-4 rounded-full border-2 bg-zinc-900 transition-all ${node.isComplete ? 'border-cyan-400' : 'border-rose-400'} ${isConnecting ? 'hover:border-green-400 hover:bg-green-900' : ''}`} />
+                    </div>
+                ))}
+            </div>
         </div>
 
-        {/* Ports */}
-        {node.inputs.map((port, index) => (
-            <div 
-                key={port.id} 
-                className="connection-port group absolute -left-1.5 -translate-y-1/2 flex items-center z-10" 
-                style={{ top: getPortY(index, node.inputs.length, node.size.height) }} 
-                onMouseUp={(e) => { e.stopPropagation(); onConnectEnd(node.id, port.id); }}
-                onContextMenu={(e) => {
-                    if (!contextMenuEnabled || drawingMode) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    actions.openContextMenu({ type: 'port', nodeId: node.id, portId: port.id, portType: 'input', x: e.clientX, y: e.clientY });
-                }}
-            >
-                <div className={`w-3 h-3 rounded-full border-2 border-white cursor-crosshair transition-all duration-200 ${isConnecting ? 'hover:bg-green-500 scale-125' : ''} ${activeInputs.has(port.id) ? 'bg-green-500' : 'bg-zinc-400'}`} />
-                <span className="port-label hidden group-hover:block absolute left-full ml-2 px-2 py-0.5 bg-zinc-800 text-white text-[10px] rounded-md whitespace-nowrap z-50">{port.name.length > 2 ? `${port.name.substring(0, 2)}..` : port.name}</span>
-            </div>
-        ))}
-        {node.outputs.map((port, index) => (
-            <div 
-                key={port.id} 
-                className="connection-port group absolute -right-1.5 -translate-y-1/2 flex items-center z-10" 
-                style={{ top: getPortY(index, node.outputs.length, node.size.height) }} 
-                onMouseDown={(e) => { e.stopPropagation(); onConnectStart(node.id, port.id); }}
-                onContextMenu={(e) => {
-                    if (!contextMenuEnabled || drawingMode) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    actions.openContextMenu({ type: 'port', nodeId: node.id, portId: port.id, portType: 'output', x: e.clientX, y: e.clientY });
-                }}
-            >
-                <span className="port-label hidden group-hover:block absolute right-full mr-2 px-2 py-0.5 bg-zinc-800 text-white text-[10px] rounded-md whitespace-nowrap z-50">{port.name.length > 2 ? `${port.name.substring(0, 2)}..` : port.name}</span>
-                <div className={`w-3 h-3 rounded-full border-2 border-white cursor-crosshair transition-all duration-200 ${node.isComplete ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`} />
-            </div>
-        ))}
-        
-        {/* Mininode Tabs & Content */}
+        {/* Mininodes Container */}
         {hasMininodes && (
-            <div className={`w-full border-l-2 border-r-2 border-b-2 rounded-b-md -mt-px bg-zinc-800 ${node.isPinned ? 'border-dashed' : ''}`} style={{borderColor}}>
-                {/* Tab Bar container provides the full-width bottom line */}
-                <div className={`border-b-2 ${node.isPinned ? 'border-dashed' : ''}`} style={{borderColor}}>
-                    {mininodes.map(mn => {
-                        const isActive = activeMininodeId === mn.id;
-                        const contentBg = 'bg-zinc-800';
-                        return (
-                            <button
-                                key={mn.id}
-                                draggable={!drawingMode}
-                                onDragStart={(e) => {
-                                    if (drawingMode) return;
-                                    e.dataTransfer.effectAllowed = 'move';
-                                    actions.setDraggedMininodeInfo({ id: mn.id, parentId: node.id });
-                                }}
-                                onDragEnd={() => {
-                                    if (drawingMode) return;
-                                    actions.setDraggedMininodeInfo(null);
-                                }}
-                                onClick={() => setActiveMininodeId(prev => prev === mn.id ? null : mn.id)}
-                                onDoubleClick={(e) => { e.stopPropagation(); onMininodeDoubleClick(mn); }}
-                                onContextMenu={(e) => {
-                                    if (!contextMenuEnabled || drawingMode) return;
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    actions.openContextMenu({ type: 'mininode', targetId: mn.id, x: e.clientX, y: e.clientY });
-                                }}
-                                title={mn.title}
-                                className={`inline-flex items-center justify-center p-2 text-sm transition-colors border-b-2
-                                    ${isActive
-                                        ? `border-cyan-500 ${contentBg} -mb-[2px]`
-                                        : `border-transparent text-zinc-400 opacity-70 hover:opacity-100 hover:bg-zinc-700`
-                                    }
-                                    ${draggedMininodeInfo?.id === mn.id ? 'opacity-40' : ''}`}
-                            >
-                                <FileIcon icon={mn.icon} className="w-5 h-5" />
-                            </button>
-                        );
-                    })}
-                </div>
-                
-                {/* Content Panel */}
-                {activeMininode && showMininodePreviews && (
-                    <div
-                        className="p-3 overflow-y-auto max-h-48 relative bg-zinc-800"
-                    >
-                        <div
-                            className="markdown-content text-sm dark-theme"
-                            dangerouslySetInnerHTML={{ __html: renderedMininodeContent }}
-                        />
+            <div className={`flex flex-col border-x-2 border-b-2 rounded-b-md transition-colors duration-200 ${borderColor === '#facc15' ? 'border-yellow-400' : 'border-zinc-700'}`}>
+                {showMininodePreviews && (
+                    <div className="relative w-full h-32 bg-zinc-900/80 p-2 overflow-y-auto">
+                        <div className="prose prose-sm prose-invert text-xs" dangerouslySetInnerHTML={{ __html: renderedMininodeContent }} />
                     </div>
                 )}
+                <div className={`flex flex-wrap items-center p-1 gap-1 transition-colors ${borderColor === '#facc15' ? 'bg-yellow-400/10' : 'bg-zinc-800/50'}`}>
+                    {mininodes.map(mn => (
+                        <button
+                            key={mn.id}
+                            draggable
+                            onDragStart={(e) => { e.stopPropagation(); actions.setDraggedMininodeInfo({ id: mn.id, parentId: mn.parentId }); }}
+                            onDragEnd={(e) => { e.stopPropagation(); actions.setDraggedMininodeInfo(null); }}
+                            onDoubleClick={(e) => { e.stopPropagation(); onMininodeDoubleClick(mn); }}
+                            onClick={() => setActiveMininodeId(mn.id)}
+                            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs transition-colors border ${activeMininodeId === mn.id ? 'bg-cyan-800/50 border-cyan-600' : 'bg-zinc-700/60 border-transparent hover:bg-zinc-600/80'}`}
+                            title={mn.title}
+                        >
+                            <FileIcon icon={mn.icon} className="w-4 h-4 flex-shrink-0"/>
+                            <span className="truncate max-w-24">{mn.title}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
         )}
-        
-        {/* Selection Highlight */}
-        {isSelected && (
-          <div
-            className="absolute inset-0 border-2 border-dashed border-yellow-400 pointer-events-none"
-            style={{ 
-                borderRadius: `${topLeftRadius} ${topRightRadius} ${hasMininodes ? '6px' : bottomRightRadius} ${hasMininodes ? '6px' : bottomLeftRadius}`,
-            }}
-          />
-        )}
-
-
-        {/* Resize Handles */}
-        {isSelected && !node.isPinned && (
-            <>
-                 <ResizeHandle 
-                    onMouseDown={(e) => { e.stopPropagation(); onNodeResizeStart(node.id, 'br', e); }}
-                    className="bottom-[-6px] right-[-6px] cursor-nwse-resize"
-                    title="Redimensionar"
-                />
-                 <ResizeHandle 
-                    onMouseDown={(e) => { e.stopPropagation(); onNodeResizeStart(node.id, 'r', e); }}
-                    className="top-1/2 right-[-6px] -translate-y-1/2 cursor-ew-resize"
-                    title="Redimensionar Ancho"
-                />
-                <ResizeHandle 
-                    onMouseDown={(e) => { e.stopPropagation(); onNodeResizeStart(node.id, 'b', e); }}
-                    className={ `left-1/2 bottom-[-6px] -translate-x-1/2 cursor-ns-resize ${hasMininodes ? 'bottom-[-6px]' : 'bottom-[-6px]' }`}
-                    title="Redimensionar Alto"
-                />
-            </>
-        )}
       </div>
+
+      {isSelected && (
+        <div 
+          className="absolute inset-0 border-2 border-dashed border-yellow-400 rounded-lg pointer-events-none" 
+          style={{
+            borderRadius: shapeStyles.borderRadius,
+            width: `${node.size.width}px`,
+            height: `${node.size.height}px`,
+          }}
+        >
+          <ResizeHandle className="-right-1.5 -bottom-1.5 cursor-se-resize" onMouseDown={(e) => onNodeResizeStart(node.id, 'br', e)} title="Redimensionar" />
+          <ResizeHandle className="-right-1.5 top-1/2 -translate-y-1/2 cursor-ew-resize" onMouseDown={(e) => onNodeResizeStart(node.id, 'r', e)} title="Redimensionar Ancho" />
+          <ResizeHandle className="left-1/2 -translate-x-1/2 -bottom-1.5 cursor-ns-resize" onMouseDown={(e) => onNodeResizeStart(node.id, 'b', e)} title="Redimensionar Alto" />
+        </div>
+      )}
     </div>
   );
 };

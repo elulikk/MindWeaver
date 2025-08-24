@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Node } from '../types';
 import AdvancedNodeSettingsPanel from './AdvancedNodeSettingsModal';
@@ -56,6 +53,25 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
   
   const [advancedPanelKey, setAdvancedPanelKey] = useState(Date.now());
   const [initialAdvancedTab, setInitialAdvancedTab] = useState<'ports' | 'general' | 'icon'>('general');
+
+  const [openMininodeId, setOpenMininodeId] = useState<number | null>(null);
+  const mininodeMenuRef = useRef<HTMLDivElement>(null);
+
+    // Click outside handler for mininode dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (mininodeMenuRef.current && !mininodeMenuRef.current.contains(event.target as globalThis.Node)) {
+                setOpenMininodeId(null);
+            }
+        };
+        if (openMininodeId !== null) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openMininodeId]);
+
 
   useEffect(() => {
     setEditedNode(node);
@@ -836,7 +852,7 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
           </div>
 
           <div className="flex-shrink-0 flex justify-between items-center gap-3 p-4 border-t border-zinc-700">
-              <div className="flex items-center gap-2 overflow-x-auto min-w-0">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
                 <button
                     type="button"
                     onClick={() => { setInitialAdvancedTab('general'); setAdvancedPanelKey(Date.now()); setIsAdvancedSettingsOpen(true); }}
@@ -856,12 +872,25 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
                 </button>
                 {mininodes.length > 0 && <div className="w-px h-6 bg-zinc-600 flex-shrink-0" />}
                 {mininodes.map(mn => (
-                    <div key={mn.id} className="flex-shrink-0 flex items-center gap-1 p-1 rounded-md bg-zinc-700/60" title={mn.title}>
-                        <FileIcon icon={mn.icon} className="w-5 h-5 flex-shrink-0" />
-                        <span className="truncate text-xs flex-grow text-zinc-300 max-w-24">{mn.title}</span>
-                        <button onClick={() => actions.openModal({ type: 'editMininode', mininode: mn })} title="Editar" className="p-1.5 rounded hover:bg-zinc-600 text-zinc-300"><Icon icon="settings" className="w-4 h-4" /></button>
-                        <button onClick={() => actions.exportMininodeContent(mn.id)} title="Descargar" className="p-1.5 rounded hover:bg-zinc-600 text-zinc-300"><Icon icon="download" className="w-4 h-4" /></button>
-                        <button onClick={() => actions.requestDeleteMininode(mn.id)} title="Eliminar" className="p-1.5 rounded hover:bg-red-500/20 text-red-400"><Icon icon="delete" className="w-4 h-4" /></button>
+                    <div key={mn.id} className="relative flex-shrink-0" ref={openMininodeId === mn.id ? mininodeMenuRef : null}>
+                        <button
+                            type="button"
+                            onClick={() => setOpenMininodeId(prev => (prev === mn.id ? null : mn.id))}
+                            className="flex-shrink-0 flex items-center gap-1.5 p-1.5 rounded-md bg-zinc-700/60 hover:bg-zinc-700 transition"
+                            title={mn.title}
+                        >
+                            <FileIcon icon={mn.icon} className="w-5 h-5 flex-shrink-0" />
+                            <span className="truncate text-xs text-zinc-300 max-w-24">{mn.title}</span>
+                            <Icon icon={openMininodeId === mn.id ? 'chevron-up' : 'chevron-down'} className="w-4 h-4 text-zinc-400" />
+                        </button>
+                
+                        {openMininodeId === mn.id && (
+                            <div className="absolute bottom-full mb-1 left-0 w-40 bg-zinc-600 rounded-md shadow-lg z-20 p-1 space-y-1">
+                                <button onClick={() => { actions.openModal({ type: 'editMininode', mininode: mn }); setOpenMininodeId(null); }} title="Editar" className="w-full flex items-center gap-2 p-1.5 text-sm rounded hover:bg-zinc-500 text-zinc-200"><Icon icon="settings" className="w-4 h-4" /> Editar</button>
+                                <button onClick={() => { actions.exportMininodeContent(mn.id); setOpenMininodeId(null); }} title="Descargar" className="w-full flex items-center gap-2 p-1.5 text-sm rounded hover:bg-zinc-500 text-zinc-200"><Icon icon="download" className="w-4 h-4" /> Descargar</button>
+                                <button onClick={() => { actions.requestDeleteMininode(mn.id); setOpenMininodeId(null); }} title="Eliminar" className="w-full flex items-center gap-2 p-1.5 text-sm rounded hover:bg-red-500/20 text-red-400"><Icon icon="delete" className="w-4 h-4" /> Eliminar</button>
+                            </div>
+                        )}
                     </div>
                 ))}
               </div>

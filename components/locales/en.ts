@@ -101,7 +101,7 @@ export default {
         paste: 'Paste',
         frameAll: 'Frame All',
         // Node
-        editNode: 'Edit Node',
+        openNode: 'Open Node',
         addMininode: 'Add Mininode',
         pinNode: 'Pin Node',
         unpinNode: 'Unpin Node',

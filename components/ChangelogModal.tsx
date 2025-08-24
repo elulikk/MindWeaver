@@ -1,6 +1,4 @@
 
-
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Icon } from './Icon';
 
@@ -14,6 +12,26 @@ interface InfoModalProps {
 type ActiveTab = 'changelog' | 'about';
 
 const changelogData = [
+    {
+        version: '1.16.0',
+        date: new Date('2024-09-13T10:00:00'),
+        changes: [
+            { type: 'ux', text: "Mejorada la selección de nodos: ahora todo el cuerpo del nodo es interactivo para la selección y el arrastre, no solo la cabecera." },
+            { type: 'fix', text: "Corregido un error en el editor de nodos que impedía que los menús desplegables de los 'dientes' (mininodos) se mostraran correctamente al ser cortados por el contenedor." },
+            { type: 'style', text: "Ajustado el diseño de los nodos en el lienzo: las estrellas de dificultad y el tiempo estimado ahora se muestran en filas separadas para una mejor legibilidad." },
+        ],
+    },
+    {
+        version: '1.15.6',
+        date: new Date('2024-09-12T10:00:00'),
+        changes: [
+            { type: 'ux', text: "El menú contextual ahora detecta los bordes de la aplicación y se reposiciona para permanecer siempre visible." },
+            { type: 'fix', text: "Solucionado un problema que impedía moverse por el lienzo (pan) con el botón central del ratón en los modos de dibujo." },
+            { type: 'fix', text: "Corregido un error que permitía mover los nodos con el botón central del ratón; ahora solo se pueden mover con el clic principal." },
+            { type: 'ux', text: "Añadida la opción 'Abrir Nodo' al menú contextual de los nodos para un acceso más intuitivo al editor." },
+            { type: 'style', text: "Reducido el tamaño de las estrellas de dificultad en los nodos para una apariencia más limpia." },
+        ],
+    },
     {
         version: '1.15.5',
         date: new Date('2024-09-11T10:00:00'),
