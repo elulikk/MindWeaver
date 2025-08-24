@@ -1,0 +1,246 @@
+
+
+body {
+  overscroll-behavior: none;
+}
+.markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: bold; margin-bottom: 0.5em; margin-top: 1em; }
+.markdown-content h1 { font-size: 1.5em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em;}
+.markdown-content h2 { font-size: 1.25em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em;}
+.markdown-content h3 { font-size: 1.1em; }
+.markdown-content p { margin-bottom: 1em; line-height: 1.6; }
+.markdown-content ul, .markdown-content ol { margin-left: 1.5em; margin-bottom: 1em; list-style-position: outside; }
+.markdown-content li { margin-bottom: 0.5em; }
+.markdown-content hr { border-top: 1px solid #e2e8f0; margin: 1.5em 0; }
+.markdown-content code {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.markdown-content pre {
+  background-color: #f1f5f9;
+  padding: 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  position: relative;
+}
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+.markdown-content blockquote {
+  border-left: 4px solid #cbd5e1;
+  padding-left: 1em;
+  margin-left: 0;
+  color: #475569;
+  position: relative;
+}
+.markdown-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+.markdown-content th, .markdown-content td {
+  border: 1px solid #cbd5e1;
+  padding: 0.5em 0.75em;
+}
+.markdown-content th {
+  font-weight: bold;
+  background-color: #f8fafc;
+}
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+}
+
+/* Dark theme adjustments */
+.markdown-content.dark-theme h1, .markdown-content.dark-theme h2 { border-bottom-color: #52525b; }
+.markdown-content.dark-theme hr { border-top-color: #52525b; }
+.markdown-content.dark-theme code { background-color: #3f3f46; color: #a1a1aa; }
+.markdown-content.dark-theme pre { background-color: #3f3f46; }
+.markdown-content.dark-theme blockquote { border-left-color: #71717a; color: #a1a1aa; }
+.markdown-content.dark-theme a { color: #67e8f9; }
+.markdown-content.dark-theme th, .markdown-content.dark-theme td { border-color: #71717a; }
+.markdown-content.dark-theme th { background-color: #3f3f46; }
+
+/* Block-level Copy Button Styles */
+.copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, background-color 0.2s, color 0.2s, border-color 0.2s;
+  z-index: 10;
+}
+.markdown-content pre:hover .copy-button,
+.markdown-content blockquote:hover .copy-button {
+  opacity: 1;
+}
+.copy-button svg { width: 1rem; height: 1rem; }
+.copy-button { background-color: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+.copy-button:hover { background-color: #cbd5e1; }
+.copy-button.copied { background-color: #16a34a; color: white; border-color: #15803d; }
+.markdown-content.dark-theme .copy-button { background-color: #52525b; color: #d4d4d8; border-color: #71717a; }
+.markdown-content.dark-theme .copy-button:hover { background-color: #71717a; }
+.markdown-content.dark-theme .copy-button.copied { background-color: #22c5e5; color: white; border-color: #16a34a; }
+
+/* Inline Code Copy Button Styles */
+.inline-code-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.copy-button-inline {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+  z-index: 10;
+  transform: scale(0.8);
+}
+.inline-code-wrapper:hover .copy-button-inline {
+  opacity: 1;
+  transform: scale(1);
+}
+.copy-button-inline svg { width: 10px; height: 10px; }
+.copy-button-inline { background-color: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+.copy-button-inline:hover { background-color: #cbd5e1; }
+.copy-button-inline.copied { background-color: #16a34a; color: white; border-color: #15803d; }
+.markdown-content.dark-theme .copy-button-inline { background-color: #52525b; color: #d4d4d8; border-color: #71717a; }
+.markdown-content.dark-theme .copy-button-inline:hover { background-color: #71717a; }
+.markdown-content.dark-theme .copy-button-inline.copied { background-color: #22c5e5; color: white; border-color: #16a34a; }
+
+/* NEW Styles for Code Block with Title */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 1em;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 0.5em 0.5em 1em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.8em;
+}
+.code-block-header .copy-button {
+  position: static;
+  opacity: 1;
+  background-color: transparent;
+  border: none;
+}
+.code-block-wrapper pre {
+  margin: 0;
+  border-radius: 0 0 6px 6px;
+  border-top: 1px solid;
+}
+.markdown-content .code-block-header { background-color: #e2e8f0; color: #475569; }
+.markdown-content .code-block-wrapper pre { border-top-color: #cbd5e1; }
+.markdown-content.dark-theme .code-block-header { background-color: #52525b; color: #d4d4d8; }
+.markdown-content.dark-theme .code-block-wrapper pre { border-top-color: #71717a; }
+.markdown-content.dark-theme .code-block-header .copy-button { color: #d4d4d8; }
+.markdown-content.dark-theme .code-block-header .copy-button:hover { background-color: #71717a; }
+.markdown-content .code-block-header .copy-button:hover { background-color: #cbd5e1; }
+
+@keyframes flag-wave {
+  0%, 100% {
+    transform: skewX(0deg) skewY(0deg);
+  }
+  50% {
+    transform: skewX(-15deg) skewY(5deg);
+  }
+}
+
+.animate-flag-wave {
+  animation: flag-wave 2.5s ease-in-out infinite;
+  transform-origin: 0% 50%;
+}
+
+/* Star difficulty outline */
+.star-difficulty {
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.7));
+}
+
+/* --- NEW SWITCH TOGGLE --- */
+.switch-toggle-wrapper {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.switch-toggle-checkbox {
+  position: absolute;
+  visibility: hidden;
+}
+
+.switch-toggle-label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.switch-toggle-switch {
+  display: inline-block;
+  background: #52525b; /* zinc-600 */
+  border-radius: 10px;
+  width: 34px;
+  height: 20px;
+  position: relative;
+  vertical-align: middle;
+  transition: background 0.25s;
+}
+
+.switch-toggle-switch:before {
+  content: "";
+  display: block;
+  background-color: #e4e4e7; /* zinc-200 */
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.25s;
+}
+
+.switch-toggle-label:hover .switch-toggle-switch:before {
+  background-color: #f4f4f5; /* zinc-100 */
+}
+
+.switch-toggle-checkbox:checked + .switch-toggle-label .switch-toggle-switch {
+  background: #22d3ee; /* cyan-500 */
+}
+
+.switch-toggle-checkbox:checked + .switch-toggle-label .switch-toggle-switch:before {
+  left: 16px;
+}
