@@ -1,5 +1,3 @@
-
-
 import { MindMapCoreState } from './types';
 import { SaveData } from './storeState';
 

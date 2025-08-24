@@ -4,8 +4,10 @@ import React, { useRef, useEffect } from 'react';
 import { useMindMapStore } from '../store';
 import { LogEntry } from '../types';
 import { Icon } from './Icon';
+import { useTranslations } from './locales/i18n';
 
 const LogPanel: React.FC = () => {
+    const t = useTranslations();
     const { logHistory, actions } = useMindMapStore(state => ({
         logHistory: state.logHistory,
         actions: state.actions
@@ -40,18 +42,18 @@ const LogPanel: React.FC = () => {
             className="fixed bottom-0 left-0 right-0 h-48 flex flex-col z-40 border-t transition-colors bg-zinc-900/90 border-zinc-700 backdrop-blur-md"
         >
             <header className="flex items-center justify-between p-2 border-b border-zinc-700">
-                <h3 className="font-semibold text-sm">Registro de Actividad</h3>
+                <h3 className="font-semibold text-sm">{t('logPanel.title')}</h3>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={actions.clearLogHistory}
-                        title="Limpiar Registro"
+                        title={t('logPanel.clear')}
                         className="p-1.5 rounded-md hover:bg-zinc-700"
                     >
                         <Icon icon="clear" className="h-4 w-4" />
                     </button>
                     <button
                         onClick={actions.toggleLogPanel}
-                        title="Ocultar Panel"
+                        title={t('logPanel.hide')}
                         className="p-1.5 rounded-md hover:bg-zinc-700"
                     >
                         <Icon icon="hide" className="h-4 w-4" />
@@ -61,7 +63,7 @@ const LogPanel: React.FC = () => {
             <div ref={contentRef} className="flex-grow overflow-y-auto p-2 font-mono text-xs">
                 {logHistory.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-zinc-500">
-                        <p>No hay actividad para mostrar.</p>
+                        <p>{t('logPanel.empty')}</p>
                     </div>
                 ) : (
                     logHistory.map(log => {

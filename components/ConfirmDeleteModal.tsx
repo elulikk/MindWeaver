@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
+import { useTranslations } from './locales/i18n';
 
 interface ConfirmDeleteModalProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface ConfirmDeleteModalProps {
 }
 
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onClose, onConfirm, nodeTitle, bodyText, confirmText }) => {
+  const t = useTranslations();
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   
   const [position, setPosition] = useState({ x: window.innerWidth / 2 - 224, y: window.innerHeight / 2 - 125 });
@@ -113,10 +115,10 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onClose, onConf
               </div>
               <div>
                   <h2 className="text-xl font-bold text-zinc-100">
-                    Confirmar Eliminación
+                    {t('modals.deleteConfirm.title')}
                   </h2>
                   <p className="mt-2 text-zinc-300">
-                    {bodyText.replace('"{nodeTitle}"', `"${nodeTitle || 'este elemento'}"`)}
+                    {bodyText}
                   </p>
               </div>
           </div>
@@ -127,7 +129,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ onClose, onConf
             onClick={onClose}
             className="px-4 py-2 font-semibold rounded-md transition text-zinc-300 bg-zinc-600 hover:bg-zinc-500 cursor-pointer"
           >
-            Cancelar
+            {t('modals.deleteConfirm.cancel')}
           </button>
           <button
             ref={confirmButtonRef}

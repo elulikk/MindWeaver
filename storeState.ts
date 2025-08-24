@@ -1,4 +1,4 @@
-import { Node, Connection, MindMapCoreState, Mininode, IconName, CanvasObject } from './types';
+import { Node, Connection, MindMapCoreState, Mininode, IconName, CanvasObject, Language } from './types';
 
 export const SCHEMA_VERSION = 6;
 

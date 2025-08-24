@@ -3,14 +3,28 @@ import { MindMapState } from './types';
 import { getInitialState } from './storeState';
 import { computeDerivedState } from './storeUtils';
 import { createActions } from './storeActions';
+import { Language } from './components/locales/i18n';
 
 export const useMindMapStore = create<MindMapState>()((set, get) => {
     
-    const initialState = getInitialState();
-    const derivedState = computeDerivedState(initialState.nodes, initialState.mininodes, initialState.connections, initialState.canvasObjects);
+    const coreInitialState = getInitialState();
+    
+    // Initialize language from localStorage, separate from core state
+    let initialLanguage: Language = 'es';
+    try {
+        const savedLang = localStorage.getItem('mindweaver-lang') as Language | null;
+        if (savedLang && (savedLang === 'es' || savedLang === 'en')) {
+            initialLanguage = savedLang;
+        }
+    } catch (e) {
+        console.warn("Could not read language from localStorage", e);
+    }
+
+    const derivedState = computeDerivedState(coreInitialState.nodes, coreInitialState.mininodes, coreInitialState.connections, coreInitialState.canvasObjects);
 
     return {
-        ...initialState,
+        ...coreInitialState,
+        language: initialLanguage,
         viewOffset: { x: 0, y: 0 },
         zoom: 1,
         mainSize: { width: 0, height: 0 },

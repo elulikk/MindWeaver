@@ -3,8 +3,10 @@ import React from 'react';
 import { useMindMapStore } from '../store';
 import { Project } from '../types';
 import { Icon } from './Icon';
+import { useTranslations } from './locales/i18n';
 
 const ProjectExplorer: React.FC = () => {
+    const t = useTranslations();
     const {
         projects,
         currentProjectId,
@@ -18,16 +20,16 @@ const ProjectExplorer: React.FC = () => {
     const timeAgo = (date: Date): string => {
         const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
         let interval = seconds / 31536000;
-        if (interval > 1) return `hace ${Math.floor(interval)} años`;
+        if (interval > 1) return t('projectExplorer.ago.years', { count: Math.floor(interval) });
         interval = seconds / 2592000;
-        if (interval > 1) return `hace ${Math.floor(interval)} meses`;
+        if (interval > 1) return t('projectExplorer.ago.months', { count: Math.floor(interval) });
         interval = seconds / 86400;
-        if (interval > 1) return `hace ${Math.floor(interval)} días`;
+        if (interval > 1) return t('projectExplorer.ago.days', { count: Math.floor(interval) });
         interval = seconds / 3600;
-        if (interval > 1) return `hace ${Math.floor(interval)} horas`;
+        if (interval > 1) return t('projectExplorer.ago.hours', { count: Math.floor(interval) });
         interval = seconds / 60;
-        if (interval > 1) return `hace ${Math.floor(interval)} minutos`;
-        return `hace unos segundos`;
+        if (interval > 1) return t('projectExplorer.ago.minutes', { count: Math.floor(interval) });
+        return t('projectExplorer.ago.seconds');
     };
 
     const ProjectItem: React.FC<{ project: Project }> = ({ project }) => (
@@ -55,7 +57,7 @@ const ProjectExplorer: React.FC = () => {
                         actions.openModal({ type: 'projectIconPicker', projectId: project.id });
                     }}
                     className="w-7 h-7 flex items-center justify-center rounded-md transition-colors text-zinc-400 opacity-0 group-hover:opacity-100 hover:bg-zinc-600"
-                    title="Cambiar icono"
+                    title={t('projectExplorer.changeIcon')}
                 >
                     <Icon icon="frame" className="w-4 h-4" />
                 </button>
@@ -65,7 +67,7 @@ const ProjectExplorer: React.FC = () => {
                         actions.deleteProject(project.id);
                     }}
                     className="w-7 h-7 flex items-center justify-center rounded-md transition-colors text-zinc-400 opacity-0 group-hover:opacity-100 hover:bg-red-900/50 hover:text-red-400"
-                    title="Eliminar proyecto"
+                    title={t('projectExplorer.deleteProject')}
                 >
                     <Icon icon="delete" className="w-4 h-4" />
                 </button>

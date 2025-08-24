@@ -1,6 +1,9 @@
 
 
 import type { IconName as UIIconName } from './components/icons';
+import { Language } from './components/locales/i18n';
+
+export { Language };
 
 export interface Point {
   x: number;
@@ -251,6 +254,7 @@ export interface MindMapState extends MindMapCoreState {
 
   // UI State
   focusModeEnabled: boolean;
+  language: Language;
 
   // Computed properties
   isDarkTheme: boolean;
@@ -367,6 +371,7 @@ export interface AppActions {
 
     // UI Actions
     toggleFocusMode: () => void;
+    setLanguage: (lang: Language) => void;
 
     // File/DB Actions
     saveOrUpdateProject: (options?: { silent?: boolean }) => Promise<void>;

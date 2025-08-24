@@ -25,12 +25,14 @@ import { Icon } from './components/Icon';
 import { Connection, IconName, ActiveModal, CanvasObjectShape } from './types';
 import { isColorDark } from './utils';
 import { SCHEMA_VERSION } from './storeState';
+import { useTranslations } from './components/locales/i18n';
 
 const VIRTUAL_CANVAS_SIZE = 10000;
 const PORT_OFFSET = 8;
-const APP_VERSION = '1.15.2';
+const APP_VERSION = '1.15.4';
 
 const ContextMenu = () => {
+    const t = useTranslations();
     const { contextMenu, actions, selectedNodeIds, connectingInfo, canvasObjectsById } = useMindMapStore();
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -80,26 +82,26 @@ const ContextMenu = () => {
                 if (connectingInfo) {
                     return (
                         <>
-                            <MenuItem onClick={() => actions.addNodeAndConnect('normal')} icon="node-normal" label="Nodo Normal" />
-                            <MenuItem onClick={() => actions.addNodeAndConnect('starter')} icon="node-start" label="Nodo Inicio" />
-                            <MenuItem onClick={() => actions.addNodeAndConnect('finish')} icon="node-finish" label="Nodo Final" />
-                            <MenuItem onClick={() => actions.addNodeAndConnect('and')} icon="node-and" label="Nodo Y (AND)" />
-                            <MenuItem onClick={() => actions.addNodeAndConnect('or')} icon="node-or" label="Nodo O (OR)" />
-                            <MenuItem onClick={() => actions.addNodeAndConnect('empty')} icon="node-empty" label="Nodo Vacío" />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('normal')} icon="node-normal" label={t('contextMenu.nodeNormal')} />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('starter')} icon="node-start" label={t('contextMenu.nodeStart')} />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('finish')} icon="node-finish" label={t('contextMenu.nodeFinish')} />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('and')} icon="node-and" label={t('contextMenu.nodeAnd')} />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('or')} icon="node-or" label={t('contextMenu.nodeOr')} />
+                            <MenuItem onClick={() => actions.addNodeAndConnect('empty')} icon="node-empty" label={t('contextMenu.nodeEmpty')} />
                         </>
                     );
                 }
                 return (
                     <>
-                        <MenuItem onClick={() => actions.addNode('normal')} icon="node-normal" label="Nodo Normal" />
-                        <MenuItem onClick={() => actions.addNode('starter')} icon="node-start" label="Nodo Inicio" />
-                        <MenuItem onClick={() => actions.addNode('finish')} icon="node-finish" label="Nodo Final" />
-                        <MenuItem onClick={() => actions.addNode('and')} icon="node-and" label="Nodo Y (AND)" />
-                        <MenuItem onClick={() => actions.addNode('or')} icon="node-or" label="Nodo O (OR)" />
-                        <MenuItem onClick={() => actions.addNode('empty')} icon="node-empty" label="Nodo Vacío" />
+                        <MenuItem onClick={() => actions.addNode('normal')} icon="node-normal" label={t('contextMenu.nodeNormal')} />
+                        <MenuItem onClick={() => actions.addNode('starter')} icon="node-start" label={t('contextMenu.nodeStart')} />
+                        <MenuItem onClick={() => actions.addNode('finish')} icon="node-finish" label={t('contextMenu.nodeFinish')} />
+                        <MenuItem onClick={() => actions.addNode('and')} icon="node-and" label={t('contextMenu.nodeAnd')} />
+                        <MenuItem onClick={() => actions.addNode('or')} icon="node-or" label={t('contextMenu.nodeOr')} />
+                        <MenuItem onClick={() => actions.addNode('empty')} icon="node-empty" label={t('contextMenu.nodeEmpty')} />
                         <Separator />
-                        <MenuItem onClick={actions.pasteFromClipboard} icon="paste" label="Pegar" disabled={!useMindMapStore.getState().clipboard} />
-                        <MenuItem onClick={actions.frameAllNodes} icon="frame" label="Encuadrar Todo" />
+                        <MenuItem onClick={actions.pasteFromClipboard} icon="paste" label={t('contextMenu.paste')} disabled={!useMindMapStore.getState().clipboard} />
+                        <MenuItem onClick={actions.frameAllNodes} icon="frame" label={t('contextMenu.frameAll')} />
                     </>
                 );
             case 'node':
@@ -108,19 +110,19 @@ const ContextMenu = () => {
                 const isMultiSelect = selectedNodeIds.size > 1;
                 return (
                     <>
-                       {!isMultiSelect && <MenuItem onClick={() => actions.openModal({ type: 'edit', node })} icon="settings" label="Editar Nodo" />}
-                       {!isMultiSelect && <MenuItem onClick={() => actions.addMininode(targetId)} icon="add" label="Añadir Diente" />}
+                       {!isMultiSelect && <MenuItem onClick={() => actions.openModal({ type: 'edit', node })} icon="settings" label={t('contextMenu.editNode')} />}
+                       {!isMultiSelect && <MenuItem onClick={() => actions.addMininode(targetId)} icon="add" label={t('contextMenu.addMininode')} />}
                        {!isMultiSelect && <MenuItem 
                             onClick={() => actions.toggleNodePin(targetId)} 
                             icon={node.isPinned ? 'pin-off' : 'pin-on'} 
-                            label={node.isPinned ? 'Desanclar Nodo' : 'Anclar Nodo'} 
+                            label={node.isPinned ? t('contextMenu.unpinNode') : t('contextMenu.pinNode')} 
                         />}
-                        {isMultiSelect && <MenuItem onClick={actions.reorganizeOrderIndexForSelection} icon="workflow" label="Reorganizar orden de la selección"/>}
+                        {isMultiSelect && <MenuItem onClick={actions.reorganizeOrderIndexForSelection} icon="workflow" label={t('contextMenu.reorganizeSelection')}/>}
                         <Separator />
-                        <MenuItem onClick={actions.copySelection} icon="copy" label="Copiar" disabled={selectedNodeIds.size === 0} />
-                        <MenuItem onClick={actions.exportSelectionToHtml} icon="html" label="Exportar selección a HTML" disabled={selectedNodeIds.size === 0} />
+                        <MenuItem onClick={actions.copySelection} icon="copy" label={t('contextMenu.copy')} disabled={selectedNodeIds.size === 0} />
+                        <MenuItem onClick={actions.exportSelectionToHtml} icon="html" label={t('contextMenu.exportSelectionHtml')} disabled={selectedNodeIds.size === 0} />
                         <Separator />
-                        <MenuItem onClick={() => actions.requestDeleteSelection()} icon="delete" label="Eliminar" destructive />
+                        <MenuItem onClick={() => actions.requestDeleteSelection()} icon="delete" label={t('contextMenu.delete')} destructive />
                     </>
                 );
             case 'mininode':
@@ -129,10 +131,10 @@ const ContextMenu = () => {
                 if (!mininode) return null;
                 return (
                     <>
-                        <MenuItem onClick={() => actions.openModal({ type: 'editMininode', mininode })} icon="settings" label="Editar Diente" />
-                        <MenuItem onClick={() => actions.exportMininodeContent(mininodeId)} icon="download" label={`Descargar archivo (${mininode.title})`} />
+                        <MenuItem onClick={() => actions.openModal({ type: 'editMininode', mininode })} icon="settings" label={t('contextMenu.editMininode')} />
+                        <MenuItem onClick={() => actions.exportMininodeContent(mininodeId)} icon="download" label={t('contextMenu.downloadMininode', { title: mininode.title })} />
                         <Separator />
-                        <MenuItem onClick={() => actions.requestDeleteMininode(mininodeId)} icon="delete" label="Eliminar Diente" destructive />
+                        <MenuItem onClick={() => actions.requestDeleteMininode(mininodeId)} icon="delete" label={t('contextMenu.deleteMininode')} destructive />
                     </>
                 );
             case 'connection':
@@ -140,16 +142,16 @@ const ContextMenu = () => {
                 const isWireless = conn.isWireless ?? false;
                 return (
                     <>
-                        <MenuItem onClick={() => actions.insertNodeInConnection(conn)} icon="add" label="Insertar Nodo" />
-                        <MenuItem onClick={() => actions.toggleConnectionWirelessMode(conn)} icon="wifi" label={isWireless ? "Hacer Cableado" : "Hacer Inalámbrico"} />
+                        <MenuItem onClick={() => actions.insertNodeInConnection(conn)} icon="add" label={t('contextMenu.insertNode')} />
+                        <MenuItem onClick={() => actions.toggleConnectionWirelessMode(conn)} icon="wifi" label={isWireless ? t('contextMenu.makeWired') : t('contextMenu.makeWireless')} />
                         <Separator />
-                        <MenuItem onClick={() => actions.deleteConnection(conn)} icon="delete" label="Eliminar Conexión" destructive />
+                        <MenuItem onClick={() => actions.deleteConnection(conn)} icon="delete" label={t('contextMenu.deleteConnection')} destructive />
                     </>
                 );
             case 'port': {
                 const { nodeId, portId, portType } = contextMenu as { nodeId: number, portId: string, portType: 'input' | 'output' };
                 return (
-                    <MenuItem onClick={() => actions.deletePort(nodeId, portType, portId)} icon="delete" label="Eliminar Puerto" destructive />
+                    <MenuItem onClick={() => actions.deletePort(nodeId, portType, portId)} icon="delete" label={t('contextMenu.deletePort')} destructive />
                 );
             }
             case 'canvas-object': {
@@ -160,16 +162,16 @@ const ContextMenu = () => {
                 return (
                     <>
                         {object.type === 'text' && (
-                           <MenuItem onClick={() => actions.openModal({ type: 'editCanvasText', objectId })} icon="settings" label="Editar Texto" />
+                           <MenuItem onClick={() => actions.openModal({ type: 'editCanvasText', objectId })} icon="settings" label={t('contextMenu.editText')} />
                         )}
                         {object.type === 'rect' && (
                             <MenuItem 
                                 onClick={() => actions.toggleSwarm(objectId)}
                                 icon="brain"
-                                label={(object as CanvasObjectShape).isSwarm ? 'Convertir en Figura' : 'Convertir en Enjambre'}
+                                label={(object as CanvasObjectShape).isSwarm ? t('contextMenu.convertToShape') : t('contextMenu.convertToSwarm')}
                             />
                         )}
-                        <MenuItem onClick={actions.requestDeleteSelectedCanvasObjects} icon="delete" label="Eliminar" destructive />
+                        <MenuItem onClick={actions.requestDeleteSelectedCanvasObjects} icon="delete" label={t('contextMenu.delete')} destructive />
                     </>
                 );
             }
@@ -193,6 +195,7 @@ const ContextMenu = () => {
 const App: React.FC = () => {
   const mainRef = useRef<HTMLElement>(null);
   const backdropMouseDownTarget = useRef<EventTarget | null>(null);
+  const t = useTranslations();
   
   const {
     nodes,
@@ -386,10 +389,10 @@ const App: React.FC = () => {
     switch (activeModal.type) {
       case 'edit': return <EditNodeModal node={activeModal.node} onSave={actions.saveNode} onClose={actions.closeModal} />;
       case 'editMininode': return <EditMininodeModal mininode={activeModal.mininode} onSave={actions.saveMininode} onClose={actions.closeModal} />;
-      case 'delete': return <ConfirmDeleteModal nodeTitle={nodesById[activeModal.nodeId]?.title} onConfirm={actions.confirmDeleteNode} onClose={actions.closeModal} bodyText='¿Estás seguro de que quieres eliminar el nodo "{nodeTitle}"?' confirmText="Eliminar Nodo" />;
-      case 'deleteMininode': return <ConfirmDeleteModal nodeTitle={mininodesById[activeModal.mininodeId]?.title} onConfirm={actions.confirmDeleteMininode} onClose={actions.closeModal} bodyText='¿Estás seguro de que quieres eliminar el diente "{nodeTitle}"?' confirmText="Eliminar Diente" />;
-      case 'deleteSelection': return <ConfirmDeleteModal onConfirm={actions.confirmDeleteSelection} onClose={actions.closeModal} bodyText={`¿Estás seguro de que quieres eliminar ${selectedNodeIds.size} nodo(s) y sus dientes?`} confirmText={`Eliminar ${selectedNodeIds.size} Nodo(s)`} />;
-      case 'deleteCanvasObjects': return <ConfirmDeleteModal onConfirm={actions.confirmDeleteSelectedCanvasObjects} onClose={actions.closeModal} bodyText={`¿Estás seguro de que quieres eliminar ${selectedCanvasObjectIds.size} objeto(s) del lienzo?`} confirmText={`Eliminar ${selectedCanvasObjectIds.size} Objeto(s)`} />;
+      case 'delete': return <ConfirmDeleteModal nodeTitle={nodesById[activeModal.nodeId]?.title} onConfirm={actions.confirmDeleteNode} onClose={actions.closeModal} bodyText={t('modals.deleteConfirm.nodeBody', { title: nodesById[activeModal.nodeId]?.title || '' })} confirmText={t('modals.deleteConfirm.confirmDeleteNode')} />;
+      case 'deleteMininode': return <ConfirmDeleteModal nodeTitle={mininodesById[activeModal.mininodeId]?.title} onConfirm={actions.confirmDeleteMininode} onClose={actions.closeModal} bodyText={t('modals.deleteConfirm.mininodeBody', { title: mininodesById[activeModal.mininodeId]?.title || '' })} confirmText={t('modals.deleteConfirm.confirmDeleteMininode')} />;
+      case 'deleteSelection': return <ConfirmDeleteModal onConfirm={actions.confirmDeleteSelection} onClose={actions.closeModal} bodyText={t('modals.deleteConfirm.selectionBody', { count: selectedNodeIds.size })} confirmText={t('modals.deleteConfirm.confirmDeleteSelection', { count: selectedNodeIds.size })} />;
+      case 'deleteCanvasObjects': return <ConfirmDeleteModal onConfirm={actions.confirmDeleteSelectedCanvasObjects} onClose={actions.closeModal} bodyText={t('modals.deleteConfirm.canvasObjectBody', { count: selectedCanvasObjectIds.size })} confirmText={t('modals.deleteConfirm.confirmDeleteCanvasObjects', { count: selectedCanvasObjectIds.size })} />;
       case 'settings': return <SettingsModal initialSettings={{ showMininodePreviews: useMindMapStore.getState().showMininodePreviews, checkboxPosition: useMindMapStore.getState().checkboxPosition, backgroundColor, gridColor, nodeColor: nodeColor, contextMenuEnabled, defaultEditorMode: useMindMapStore.getState().defaultEditorMode, autosaveEnabled: useMindMapStore.getState().autosaveEnabled }} onSave={actions.saveSettings} onClose={actions.closeModal} />;
       case 'confirmNew': return <ConfirmNewCanvasModal onConfirm={actions.addNewProject} onClose={actions.closeModal} />;
       case 'confirmMarkAllIncomplete': return <ConfirmMarkAllIncompleteModal onConfirm={actions.confirmMarkAllIncomplete} onClose={actions.closeModal} />;
@@ -405,8 +408,8 @@ const App: React.FC = () => {
             onConfirm={actions.confirmDeleteProject} 
             onClose={actions.closeModal} 
             nodeTitle={projectToDelete?.title} 
-            bodyText='¿Estás seguro de que quieres eliminar permanentemente el proyecto "{nodeTitle}"? Esta acción no se puede deshacer.' 
-            confirmText="Eliminar Proyecto" 
+            bodyText={t('modals.deleteConfirm.projectBody', { title: projectToDelete?.title || '' })} 
+            confirmText={t('modals.deleteConfirm.confirmDeleteProject')} 
         />;
       }
       default: return null;
@@ -435,7 +438,7 @@ const App: React.FC = () => {
 
   return (
     <div className={`flex h-screen w-screen overflow-hidden font-sans select-none ${isDarkTheme ? 'dark bg-zinc-900 text-zinc-100' : 'bg-zinc-100 text-zinc-900'}`}>
-      <DockablePanel panelId="explorer" title="Proyectos" side="left">
+      <DockablePanel panelId="explorer" title={t('app.projectName')} side="left">
         <ProjectExplorer />
       </DockablePanel>
 
@@ -511,7 +514,7 @@ const App: React.FC = () => {
           
           <button
               onClick={actions.toggleFocusMode}
-              title="Modo Enfoque (resalta nodos activos)"
+              title={t('app.focusMode')}
               className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all
                   ${focusModeEnabled 
                       ? 'bg-yellow-500/80 text-black shadow-lg' 
@@ -519,7 +522,7 @@ const App: React.FC = () => {
                   }`}
           >
               <Icon icon="focus-mode" className="w-5 h-5" />
-              <span className="text-sm font-semibold">Enfoque</span>
+              <span className="text-sm font-semibold">{t('app.focus')}</span>
           </button>
 
 
@@ -576,7 +579,7 @@ const App: React.FC = () => {
           </div>
           
             <div className="absolute bottom-2 right-2 flex items-center gap-4 text-xs text-zinc-600 dark:text-zinc-400">
-                <span className="opacity-50 pointer-events-none">developed by ulik</span>
+                <span className="opacity-50 pointer-events-none">{t('app.devBy')}</span>
             </div>
 
           {isLoading && (

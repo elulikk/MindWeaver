@@ -1,6 +1,6 @@
 
 
-import { MindMapState, ActiveModal, ContextMenu, PanelState, LogEntry } from './types';
+import { MindMapState, ActiveModal, ContextMenu, PanelState, LogEntry, Language } from './types';
 
 type SetState = (partial: Partial<MindMapState> | ((state: MindMapState) => Partial<MindMapState>)) => void;
 type GetState = () => MindMapState;
@@ -52,5 +52,15 @@ export const createUIActions = (set: SetState, get: GetState) => ({
         const wasEnabled = get().focusModeEnabled;
         set({ focusModeEnabled: !wasEnabled });
         get().actions._addLog(`Modo enfoque ${!wasEnabled ? 'activado' : 'desactivado'}.`);
+    },
+    setLanguage: (lang: Language) => {
+        try {
+            localStorage.setItem('mindweaver-lang', lang);
+            set({ language: lang });
+            get().actions._addLog(`Idioma cambiado a ${lang === 'es' ? 'Español' : 'English'}.`, 'success');
+        } catch (error) {
+            console.error('Failed to save language preference:', error);
+            get().actions._addLog('No se pudo guardar la preferencia de idioma.', 'error');
+        }
     },
 });

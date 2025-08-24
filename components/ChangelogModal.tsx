@@ -14,6 +14,15 @@ type ActiveTab = 'changelog' | 'about';
 
 const changelogData = [
     {
+        version: '1.15.4',
+        date: new Date('2024-09-10T10:00:00'),
+        changes: [
+            { type: 'refactor', text: "El ajuste de idioma ahora es global para la aplicación y no está vinculado a proyectos individuales." },
+            { type: 'ux', text: "La pestaña 'Insertar' ha sido renombrada a 'Nodos' para mayor claridad." },
+            { type: 'ux', text: "Movidos los botones de Copiar, Pegar y Eliminar a la pestaña 'Nodos' para agrupar las acciones de manipulación de nodos." },
+        ],
+    },
+    {
         version: '1.15.3',
         date: new Date('2024-09-09T10:00:00'),
         changes: [
