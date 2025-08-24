@@ -1,4 +1,3 @@
-
 import { MindMapState, Mininode } from './types';
 import { getNewMininodeId } from './utils';
 
@@ -44,7 +43,18 @@ export const createMininodeActions = (set: SetState, get: GetState) => ({
         }
     },
     setDraggedMininodeInfo: (info: { id: number; parentId: number } | null) => {
-        set({ draggedMininodeInfo: info });
+        if (info === null) {
+            // When drag ends (either by dropping or cancelling),
+            // ensure any selection state from the initial mousedown is cleared.
+            set({
+                draggedMininodeInfo: null,
+                isSelecting: false,
+                selectionRect: null,
+                selectionStart: null,
+            });
+        } else {
+            set({ draggedMininodeInfo: info });
+        }
     },
     moveMininode: (mininodeId: number, newParentId: number) => {
         const { mininodes, actions, nodesById } = get();
