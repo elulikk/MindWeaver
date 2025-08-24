@@ -17,6 +17,8 @@ export interface Port {
 
 // Los nombres de los iconos ahora se gestionan en el registro de iconos.
 export type IconName = UIIconName;
+export type IconCategory = "Nodos y Flujo" | "General y UI" | "Formato" | "Desarrollo y Datos" | "Dibujo";
+
 
 export interface Node {
   id: number;

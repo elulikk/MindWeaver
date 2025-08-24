@@ -141,8 +141,6 @@ const RibbonToolbar: React.FC = () => {
                         <Separator />
                         <ActionButton onClick={actions.undo} disabled={pastStates.length === 0} tooltip={t('ribbon.home.undoTooltip')} icon="undo" iconColorClass="text-blue-400">{t('ribbon.home.undo')}</ActionButton>
                         <ActionButton onClick={actions.redo} disabled={futureStates.length === 0} tooltip={t('ribbon.home.redoTooltip')} icon="redo" iconColorClass="text-blue-400">{t('ribbon.home.redo')}</ActionButton>
-                        <Separator />
-                        <ActionButton onClick={actions.reorganizeOrderIndex} tooltip={t('ribbon.home.reorganizeTooltip')} icon="workflow" iconColorClass="text-green-400">{t('ribbon.home.reorganize')}</ActionButton>
                     </>
                 );
             case 'nodes':
@@ -193,8 +191,9 @@ const RibbonToolbar: React.FC = () => {
                     <>
                         <ActionButton onClick={actions.toggleExplorer} tooltip={t('ribbon.tools.projectsTooltip')} icon="template-electron">{t('ribbon.tools.projects')}</ActionButton>
                         <Separator />
-                        <ActionButton onClick={() => actions.openModal({ type: 'settings' })} tooltip={t('ribbon.tools.settingsTooltip')} icon="settings" iconColorClass="text-purple-400">{t('ribbon.tools.settings')}</ActionButton>
+                        <ActionButton onClick={actions.reorganizeOrderIndex} tooltip={t('ribbon.tools.reorganizeTooltip')} icon="workflow" iconColorClass="text-green-400">{t('ribbon.tools.reorganize')}</ActionButton>
                         <ActionButton onClick={actions.requestMarkAllIncomplete} tooltip={t('ribbon.tools.cleanTooltip')} icon="limpiar" iconColorClass="text-amber-500">{t('ribbon.tools.clean')}</ActionButton>
+                        <ActionButton onClick={() => actions.openModal({ type: 'settings' })} tooltip={t('ribbon.tools.settingsTooltip')} icon="settings" iconColorClass="text-purple-400">{t('ribbon.tools.settings')}</ActionButton>
                         <Separator />
                         <ActionButton onClick={() => actions.openModal({ type: 'help' })} tooltip={t('ribbon.tools.helpTooltip')} icon="help" iconColorClass="text-green-400">{t('ribbon.tools.help')}</ActionButton>
                         <ActionButton onClick={() => actions.openModal({ type: 'info' })} tooltip={t('ribbon.tools.infoTooltip')} icon="changelog" iconColorClass="text-purple-400">{t('ribbon.tools.info')}</ActionButton>

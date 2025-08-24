@@ -1,3 +1,4 @@
+
 export default {
     app: {
         projectName: 'Proyectos',
@@ -32,8 +33,6 @@ export default {
             pasteTooltip: 'Pegar (Ctrl+V)',
             delete: 'Eliminar',
             deleteTooltip: 'Eliminar selección (Supr)',
-            reorganize: 'Reorganizar Orden',
-            reorganizeTooltip: 'Reorganizar el índice de orden de los nodos según el flujo'
         },
         // Insert Tab
         insert: {
@@ -71,6 +70,8 @@ export default {
         tools: {
             projects: 'Proyectos',
             projectsTooltip: 'Mostrar/Ocultar explorador (Ctrl+B)',
+            reorganize: 'Reorganizar Orden',
+            reorganizeTooltip: 'Reorganizar el índice de orden de los nodos según el flujo',
             settings: 'Ajustes',
             settingsTooltip: 'Ajustes de apariencia',
             clean: 'Limpiar',

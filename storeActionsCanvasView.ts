@@ -541,7 +541,6 @@ export const createCanvasViewActions = (set: SetState, get: GetState) => ({
     },
     setMainSize: (size: { width: number, height: number }) => set({ mainSize: size }),
     nodeMouseDown: (nodeId: number, e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
         if (get().drawingMode) return;
         const { nodes, selectedNodeIds, mininodes } = get();
         const node = nodes.find(n => n.id === nodeId);

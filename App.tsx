@@ -1,5 +1,6 @@
 
 
+
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useMindMapStore } from './store';
 import NodeComponent from './components/NodeComponent';
@@ -29,7 +30,7 @@ import { useTranslations } from './components/locales/i18n';
 
 const VIRTUAL_CANVAS_SIZE = 10000;
 const PORT_OFFSET = 8;
-const APP_VERSION = '1.15.4';
+const APP_VERSION = '1.15.5';
 
 const ContextMenu = () => {
     const t = useTranslations();
@@ -466,13 +467,13 @@ const App: React.FC = () => {
           onMouseUp={actions.handleMouseUp}
           onWheel={actions.handleWheel}
           onContextMenu={(e) => {
-              if (!contextMenuEnabled || drawingMode) return;
+              if (!contextMenuEnabled) return;
               e.preventDefault();
               const target = e.target as HTMLElement;
               const objectElement = target.closest('[data-object-id]');
               const objectId = objectElement?.getAttribute('data-object-id');
 
-              if (drawingMode === 'edit' && objectId) {
+              if (objectId) {
                   actions.openContextMenu({ type: 'canvas-object', objectId, x: e.clientX, y: e.clientY });
               } else {
                   actions.openContextMenu({ type: 'canvas', x: e.clientX, y: e.clientY });

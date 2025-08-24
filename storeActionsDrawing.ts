@@ -1,4 +1,5 @@
 
+
 import { MindMapState, DrawingTool, CanvasObject, CanvasObjectShape } from './types';
 
 type SetState = (partial: Partial<MindMapState> | ((state: MindMapState) => Partial<MindMapState>)) => void;
@@ -50,6 +51,8 @@ export const createDrawingActions = (set: SetState, get: GetState) => ({
                     if ('fillColor' in updates && typeof updates.fillColor === 'string') newObj.fillColor = updates.fillColor;
                     if ('strokeColor' in updates && typeof updates.strokeColor === 'string') newObj.strokeColor = updates.strokeColor;
                     if ('strokeWidth' in updates && typeof updates.strokeWidth === 'number') newObj.strokeWidth = updates.strokeWidth;
+                    if ('fillOpacity' in updates && typeof updates.fillOpacity === 'number') newObj.fillOpacity = updates.fillOpacity;
+                    if ('strokeOpacity' in updates && typeof updates.strokeOpacity === 'number') newObj.strokeOpacity = updates.strokeOpacity;
                 }
                 if (newObj.type === 'line') {
                     if ('strokeColor' in updates && typeof updates.strokeColor === 'string') newObj.strokeColor = updates.strokeColor;

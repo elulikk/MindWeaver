@@ -1,5 +1,4 @@
 
-
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Node, Mininode, DrawingTool } from '../types';
 import { useMindMapStore } from '../store';
@@ -273,6 +272,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
       style={{ transform: `translate(${node.pos.x}px, ${node.pos.y}px)` }}
       onDoubleClick={onDoubleClick}
       onContextMenu={handleContextMenu}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       <div className="relative" style={{ width: `${node.size.width}px`, ...shapeStyles }}>
         {!hasInputs && <StartFlag />}
@@ -316,22 +316,22 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                     disabled={!!drawingMode}
                     onClick={(e) => { e.stopPropagation(); onTogglePin(node.id); }} 
                     aria-label={node.isPinned ? 'Desanclar nodo' : 'Anclar nodo'} 
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-white transition-all duration-200 focus:outline-none disabled:opacity-0
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-white transition-all duration-200 focus:outline-none disabled:opacity-0
                         ${node.isPinned 
                             ? 'opacity-100 bg-cyan-500/80 hover:bg-cyan-600' 
                             : 'opacity-0 group-hover:opacity-100 bg-zinc-600/50 hover:!opacity-100 hover:bg-cyan-500'}`}
                 >
-                    <Icon icon={node.isPinned ? 'pin-off' : 'pin-on'} className="w-4 h-4" />
+                    <Icon icon={node.isPinned ? 'pin-off' : 'pin-on'} className="w-3 h-3" />
                 </button>
-                <button disabled={!!drawingMode} onClick={(e) => { e.stopPropagation(); onDelete(node.id); }} aria-label="Eliminar nodo" className="delete-button w-6 h-6 rounded-full flex items-center justify-center bg-zinc-600/50 text-white opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:bg-red-500 transition-all duration-200 focus:outline-none disabled:opacity-0" ><Icon icon="delete" className="w-4 h-4" /></button>
+                <button disabled={!!drawingMode} onClick={(e) => { e.stopPropagation(); onDelete(node.id); }} aria-label="Eliminar nodo" className="delete-button w-5 h-5 rounded-full flex items-center justify-center bg-zinc-600/50 text-white opacity-0 group-hover:opacity-100 hover:!opacity-100 hover:bg-red-500 transition-all duration-200 focus:outline-none disabled:opacity-0" ><Icon icon="delete" className="w-3 h-3" /></button>
             </div>
             <div 
                 className={`relative w-full p-2 text-center transition-colors bg-white/5 border-b border-white/10 ${node.isPinned ? '' : 'active:cursor-grabbing'}`}
                 style={{ color: textColor, cursor: node.isPinned ? 'default' : 'grab' }}
-                onMouseDown={(e) => { e.stopPropagation(); onNodeMouseDown(node.id, e); }}
+                onMouseDown={(e) => { onNodeMouseDown(node.id, e); }}
             >
                 <div className="flex items-center justify-center gap-2">
-                    {node.icon && !isLogicInput && <Icon icon={node.icon} className="w-4 h-4 flex-shrink-0" style={{ color: node.iconColor }} />}
+                    {node.icon && <Icon icon={node.icon} className="w-4 h-4 flex-shrink-0" style={{ color: node.iconColor }} />}
                     <h3 className="font-bold text-base break-words select-none" title={node.title}>{node.title}</h3>
                 </div>
             </div>
@@ -339,10 +339,12 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                 <div className="flex-grow flex flex-row items-stretch justify-center relative min-h-0">
                   {isLogicInput ? (
                       <>
-                        <div className="w-1/3 flex items-center justify-center p-1 border-r border-white/20">
-                            <span className="font-bold text-2xl" style={{ color: textColor, opacity: 0.8 }}>{node.inputLogic}</span>
-                        </div>
-                        <div className="w-2/3">
+                        {!node.icon && (
+                          <div className="w-1/3 flex items-center justify-center p-1 border-r border-white/20">
+                              <span className="font-bold text-2xl" style={{ color: textColor, opacity: 0.8 }}>{node.inputLogic}</span>
+                          </div>
+                        )}
+                        <div className={!node.icon ? "w-2/3" : "w-full"}>
                             {SynthesisContent}
                         </div>
                       </>
@@ -352,7 +354,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                       </div>
                   )}
                 </div>
-                <div className="flex-shrink-0 flex items-center justify-center pt-2">
+                <div className="flex-shrink-0 flex items-center justify-center gap-2 pt-2">
                     {node.difficulty > 0 && (
                         <div className="flex items-center gap-0.5" title={`Dificultad: ${node.difficulty} de 10`}>
                             {[...Array(10)].map((_, i) => (
@@ -360,6 +362,13 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" stroke="rgba(0,0,0,0.5)" strokeWidth="1.2" strokeLinejoin="round" />
                                 </svg>
                             ))}
+                        </div>
+                    )}
+                    {(node.difficulty > 0 && node.time > 0) && <div className="w-px h-3 bg-white/20" />}
+                    {node.time > 0 && (
+                        <div className="flex items-center gap-1 text-xs" style={{ color: textColor, opacity: 0.8 }} title={`Tiempo estimado: ${node.time} min`}>
+                            <Icon icon="time" className="w-3 h-3" />
+                            <span>{node.time} min</span>
                         </div>
                     )}
                 </div>

@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Node } from '../types';
 import AdvancedNodeSettingsPanel from './AdvancedNodeSettingsModal';
@@ -52,6 +53,9 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [isEditingTime, setIsEditingTime] = useState(false);
   const timeInputRef = useRef<HTMLInputElement>(null);
+  
+  const [advancedPanelKey, setAdvancedPanelKey] = useState(Date.now());
+  const [initialAdvancedTab, setInitialAdvancedTab] = useState<'ports' | 'general' | 'icon'>('general');
 
   useEffect(() => {
     setEditedNode(node);
@@ -650,7 +654,15 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
             onMouseDown={onDragMouseDown}
           >
              <div className="flex items-center gap-3 flex-grow min-w-0">
-                 {editedNode.icon && <Icon icon={editedNode.icon} className="w-6 h-6 flex-shrink-0" style={{ color: editedNode.iconColor }} />}
+                 {editedNode.icon && (
+                    <div
+                      onDoubleClick={() => { setInitialAdvancedTab('icon'); setAdvancedPanelKey(Date.now()); setIsAdvancedSettingsOpen(true); }}
+                      className="p-1 rounded-md hover:bg-zinc-700 cursor-pointer"
+                      title="Doble clic para cambiar icono"
+                    >
+                      <Icon icon={editedNode.icon} className="w-6 h-6 flex-shrink-0" style={{ color: editedNode.iconColor }} />
+                    </div>
+                  )}
                 {isEditingTitle ? (
                   <input
                       ref={titleInputRef}
@@ -827,7 +839,7 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
               <div className="flex items-center gap-2 overflow-x-auto min-w-0">
                 <button
                     type="button"
-                    onClick={() => setIsAdvancedSettingsOpen(true)}
+                    onClick={() => { setInitialAdvancedTab('general'); setAdvancedPanelKey(Date.now()); setIsAdvancedSettingsOpen(true); }}
                     className="flex-shrink-0 px-3 py-1.5 text-sm font-semibold rounded-md transition flex items-center gap-2 text-zinc-300 bg-zinc-600 hover:bg-zinc-500"
                 >
                     <Icon icon="settings" className="h-4 w-4" />
@@ -884,6 +896,8 @@ const EditNodeModal: React.FC<EditNodeModalProps> = ({ node, onSave, onClose }) 
 
           {isAdvancedSettingsOpen && (
             <AdvancedNodeSettingsPanel
+              key={advancedPanelKey}
+              initialTab={initialAdvancedTab}
               node={editedNode}
               onSave={handleAdvancedSave}
               onClose={() => setIsAdvancedSettingsOpen(false)}

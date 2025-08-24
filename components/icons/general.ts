@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 
 export const generalIcons = {
@@ -31,9 +33,8 @@ export const generalIcons = {
   language: React.createElement(React.Fragment, null, React.createElement('path', { d: "M12 21a9 9 0 0 1-9-9 9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9Z" }), React.createElement('path', { d: "M3.6 9h16.8M3.6 15h16.8" }), React.createElement('path', { d: "M11.5 3a17 17 0 0 0 0 18m1-18a17 17 0 0 1 0 18" })),
   'spain-flag': React.createElement(React.Fragment, null, React.createElement('path', { fill: "#FFD500", d: "M0 128h512v256H0z"}), React.createElement('path', { fill: "#D80027", d: "M0 0h512v128H0zm0 384h512v128H0z"})),
   'uk-flag': React.createElement(React.Fragment, null, React.createElement('path', { fill: "#0052B4", d: "M0 0h512v512H0z"}), React.createElement('path', { fill: "#FFFFFF", d: "m512 0-256 170.66L0 0v53.42L202.67 224H0v64h202.67L0 341.42V394.8l256-169.48L512 394.8v-53.42L309.33 288h202.67v-64H309.33L512 53.42V0z"}), React.createElement('path', { fill: "#D80027", d: "m288 224 224-149.33V53.42L309.33 224H288zM0 74.67 224 224h-32L0 85.83V74.67zM0 437.33 224 288h-32l-192 128v11.33zM512 437.33 288 288h32l192 128v-11.33zM224 0h64v512h-64zM0 224h512v64H0z"})),
-};
-
-export const uiIcons = {
+  'fill-opacity': React.createElement('path', { d: "M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20V4Z"}),
+  'stroke-opacity': React.createElement('path', { d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z M16 18H8v-2h8v2z m0-4H8v-2h8v2z m-3-5V3.5L18.5 9H13z"}),
   'new-canvas': React.createElement(React.Fragment, null, React.createElement('path', { fillRule: "evenodd", d: "M3 3.75A1.75 1.75 0 014.75 2h4.5a.75.75 0 010 1.5h-4.5a.25.25 0 00-.25.25v10.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25V8.5a.75.75 0 011.5 0v5.25A1.75 1.75 0 0115.25 15H4.75A1.75 1.75 0 013 13.25V3.75z", clipRule: "evenodd" }), React.createElement('path', { fillRule: "evenodd", d: "M12.75 2a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0112.75 2z", clipRule: "evenodd" })),
   import: React.createElement('path', { d: "M13.5 8H4m0-2v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-5.032a1 1 0 0 1-.768-.36l-1.9-2.28a1 1 0 0 0-.768-.36H5a1 1 0 0 0-1 1Z"}),
   export: React.createElement('path', { d: "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" }),
@@ -43,31 +44,28 @@ export const uiIcons = {
   copy: React.createElement(React.Fragment, null, React.createElement('path', { fillRule: "evenodd", d: "M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z", clipRule: "evenodd"}), React.createElement('path', { fillRule: "evenodd", d: "M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z", clipRule: "evenodd"})),
   paste: React.createElement('path', { d: "M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1-1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 5h6m-6 4h6M10 3v4h4V3h-4Z"}),
   save: React.createElement(React.Fragment, null, 
-    React.createElement('path', { fill: "#90b1de", stroke: "#2c3d60", strokeWidth: "1.5", d: "M 3,88 3,7 C 3,4 4,3 7,3 l 86,0 c 3,0 4,2 4,5 l 0,85 c 0,2 0,4 -4,4 l -81,0 z" }),
-    React.createElement('path', { fill: "#4e7ec2", d: "m 6,6 0,81 7,7 81,0 0,-88 z" }),
-    React.createElement('path', { fill: "#999999", stroke: "#555555", strokeWidth: "2", d: "M 28 62 C 24 62 24 64 24 66 L 24 97 L 76 97 L 76 66 C 76 64 75 62 72 62 L 28 62 z M 38 66 C 45 66 44 69 44 69 L 44 87 C 44 87 45 90 38 90 C 32 90 33 87 33 87 L 33 69 C 33 69 32 66 38 66 z " }),
-    React.createElement('rect', { fill: "#ff0000", fillOpacity: "0.7", width: "66", height: "10", x: "17", y: "4" }),
-    React.createElement('rect', { fill: "#eeeeee", width: "66", height: "42", x: "17", y: "14" }),
-    React.createElement('rect', { fill: "#2c3d60", width: "6", height: "6", x: "8", y: "9" }),
-    React.createElement('path', { fill: "none", stroke: "#bbbbbb", strokeWidth: "2", d: "m 21,47 58,0 M 21,35 79,35 M 21,24 79,24" }),
-    React.createElement('path', { fill: "#cf9100", stroke: "#333333", strokeWidth: "2", d: "M 46,80 90,32 c 0,0 4,1 6,4 2,2 2,5 2,5 L 55,87 44,90 z" }),
-    React.createElement('path', { fill: "#eeeeee", d: "M 89,36 49,80 51,81 91,37 z" }),
-    React.createElement('path', { fill: "#333333", d: "m 44,90 4,-1 -3,-4 z" })
+    React.createElement('path', { fill: "#90b1de", stroke: "#2c3d60", strokeWidth: "1.5", d: "M 3,88 3,7 C 3,4 4,3 7,3 l 86,0 c 3,0 4,2 4,5 l 0,85 c 0,2 0,4 -4,4 l -86,0 c -3,0 -4,-2 -4,-5 z" }), 
+    React.createElement('rect', { x: "13", y: "3", width: "74", height: "40", rx: "4", ry: "4", fill: "#546da2", stroke: "#2c3d60", strokeWidth: "1.5" }), 
+    React.createElement('rect', { x: "22", y: "11", width: "56", height: "20", rx: "2", ry: "2", fill: "#90b1de", stroke: "#2c3d60", strokeWidth: "1.5" }), 
+    React.createElement('rect', { x: "25", y: "53", width: "50", height: "30", rx: "3", ry: "3", fill: "#fff", stroke: "#2c3d60", strokeWidth: "1.5" }), 
+    React.createElement('path', { d: "m 35,58 30,0", stroke: "#2c3d60", strokeWidth: "3" }), 
+    React.createElement('path', { d: "m 35,68 30,0", stroke: "#2c3d60", strokeWidth: "3" }), 
+    React.createElement('path', { d: "m 35,78 20,0", stroke: "#2c3d60", strokeWidth: "3" })
   ),
-  'mark-all-incomplete': React.createElement('path', { d: "M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }),
-  'drag-handle': React.createElement('path', { d: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" }),
-  frame: React.createElement('path', { d: "M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15m4.5-11.25V9m0-4.5h-4.5m4.5 0L15 9" }),
-  theme: React.createElement('path', { d: "M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" }),
-  send: React.createElement('path', { d: "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L6 12z" }),
-  hide: React.createElement('path', { d: "M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.774 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.572M15 12a3 3 0 11-6 0 3 3 0 016 0z" }),
-  clear: React.createElement('path', { d: "M12.75 3.375V2.25A.75.75 0 0012 1.5h-3.75a.75.75 0 00-.75.75v1.125m10.5 0V2.25A.75.75 0 0018 1.5h-3.75a.75.75 0 00-.75.75v1.125m-3 15.75l-1.21-7.26a.75.75 0 01.24-1.002L18 7.5l-1.5-1.5-5.54 5.54a.75.75 0 01-1.002.24L3 9.75" }),
-  explorer: React.createElement('path', { d: "M3.75 9.75h16.5m-16.5 0a.75.75 0 01.75-.75h15a.75.75 0 01.75.75m-16.5 0v5.625c0 .621.504 1.125 1.125 1.125h14.25c.621 0 1.125-.504 1.125-1.125V9.75M3.75 9.75L3.75 6.75A.75.75 0 014.5 6h5.25a.75.75 0 01.75.75v3" }),
-  log: React.createElement('path', { d: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" }),
-  'pin-on': React.createElement('path', { fillRule: "evenodd", clipRule: "evenodd", d: "M8 7V5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V7H18V19H6V7H8ZM10 5C10 3.89543 10.8954 3 12 3C13.1046 3 14 3.89543 14 5V7H10V5ZM11 14V10H13V14H11Z"}),
-  'pin-off': React.createElement('path', { fillRule: "evenodd", clipRule: "evenodd", d: "M10 5C10 3.89543 10.8954 3 12 3C13.1046 3 14 3.89543 14 5V7H8V5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V7H18V19H6V7H10V5Z" }),
+  send: React.createElement('path', { d: "M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" }),
+  hide: React.createElement('path', { d: "M2.036 12.316a1.001 1.001 0 010-1.632C4.12 8.703 7.828 7 12 7s7.88 1.703 9.964 3.684a1 1 0 010 1.632C19.88 15.297 16.172 17 12 17s-7.88-1.703-9.964-3.684zM12 9c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" }),
+  clear: React.createElement('path', { d: "M10.125 2.25h3.75M10.125 17.25h3.75M14.25 4.969L19.03 9.75M5.25 13.969L9.03 10.189" }),
+  'drag-handle': React.createElement('path', { d: "M7 14h.01M7 10h.01M10 14h.01M10 10h.01M13 14h.01M13 10h.01M16 14h.01M16 10h.01" }),
+  frame: React.createElement('path', { d: "M15.75 3.75L17.25 2.25M8.25 3.75L6.75 2.25M3.75 8.25L2.25 6.75M3.75 15.75L2.25 17.25M8.25 20.25l-1.5 1.5M15.75 20.25l1.5 1.5M20.25 15.75l1.5 1.5M20.25 8.25l1.5-1.5" }),
+  theme: React.createElement('path', { d: "M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" }),
+  explorer: React.createElement('path', { d: "M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" }),
+  log: React.createElement('path', { d: "M16 2H8C4.69 2 2 4.69 2 8v13a1 1 0 0 0 1 1h13c3.31 0 6-2.69 6-6V8c0-3.31-2.69-6-6-6zm0 18H5.83C5.38 20 5 19.62 5 19.17V8c0-1.65 1.35-3 3-3h8c1.65 0 3 1.35 3 3v8c0 1.65-1.35 3-3 3zM12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z" }),
+  'pin-on': React.createElement('path', { d: "M16.5 3.75L12 8.25l-4.5-4.5L6 5.25l4.5 4.5-2.25 2.25L5.25 15 9 18.75l3-3 3 3 3.75-3.75-3-3 2.25-2.25 4.5-4.5-1.5-1.5z" }),
+  'pin-off': React.createElement('path', { d: "M16.5 3.75L12 8.25l-4.5-4.5L6 5.25l4.5 4.5-2.25 2.25L5.25 15 9 18.75l3-3 3 3 3.75-3.75-3-3 2.25-2.25 4.5-4.5-1.5-1.5z" }),
   'chevron-left': React.createElement('path', { d: "M15.75 19.5L8.25 12l7.5-7.5" }),
   'chevron-right': React.createElement('path', { d: "M8.25 4.5l7.5 7.5-7.5 7.5" }),
-  chatbot: React.createElement('path', { fillRule: "evenodd", d: "M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.74c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z", clipRule: "evenodd" }),
-  wifi: React.createElement(React.Fragment, null, React.createElement('path', { d: "M4.93 13.07a8.5 8.5 0 0 1 14.14 0" }), React.createElement('path', { d: "M7.76 10.24a5 5 0 0 1 8.48 0" }), React.createElement('path', { d: "M10.59 7.41a2 2 0 0 1 2.82 0" }), React.createElement('path', { d: "M12 16.5h.01" })),
-  filter: React.createElement('path', { d: "M3.75 6.75h16.5M6 12h12m-9 5.25h6" }),
+  chatbot: React.createElement(React.Fragment, null, React.createElement('path', { d: "M16.5 3.75L12 8.25l-4.5-4.5L6 5.25l4.5 4.5-2.25 2.25L5.25 15 9 18.75l3-3 3 3 3.75-3.75-3-3 2.25-2.25 4.5-4.5-1.5-1.5z" }), React.createElement('path', { d: "M19.5 9.75L21.75 12l-2.25 2.25" }), React.createElement('path', { d: "M4.5 9.75L2.25 12l2.25 2.25" })),
+  'mark-all-incomplete': React.createElement('path', { d: "M12 21a9 9 0 100-18 9 9 0 000 18z" }),
+  wifi: React.createElement('path', { d: "M4.11 9.17a12 12 0 0115.78 0M5.83 10.9a8 8 0 0112.34 0M8.25 13.32a4 4 0 017.5 0M12 18h.01" }),
+  filter: React.createElement('path', { d: "M3 4.5h14.25M6.21 9.75H12m-3.99 5.25h1.38" }),
 };

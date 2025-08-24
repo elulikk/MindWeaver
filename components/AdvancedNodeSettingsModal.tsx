@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { Node, Port, IconName } from '../types';
 import { Icon } from './Icon';
@@ -98,6 +99,7 @@ interface AdvancedNodeSettingsPanelProps {
   node: Node;
   onSave: (node: Node) => void;
   onClose: () => void;
+  initialTab?: 'ports' | 'general' | 'icon';
 }
 
 const logicTypes: Array<'AND' | 'OR'> = ['AND', 'OR'];
@@ -135,9 +137,9 @@ const ColorInput: React.FC<{
     </div>
 );
 
-const AdvancedNodeSettingsPanel: React.FC<AdvancedNodeSettingsPanelProps> = ({ node, onSave, onClose }) => {
+const AdvancedNodeSettingsPanel: React.FC<AdvancedNodeSettingsPanelProps> = ({ node, onSave, onClose, initialTab }) => {
   const [editedNode, setEditedNode] = useState<Node>(node);
-  const [activeTab, setActiveTab] = useState<'ports' | 'general' | 'icon'>('general');
+  const [activeTab, setActiveTab] = useState<'ports' | 'general' | 'icon'>(initialTab || 'general');
 
   useEffect(() => {
     setEditedNode(node);

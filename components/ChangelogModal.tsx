@@ -1,5 +1,6 @@
 
 
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Icon } from './Icon';
 
@@ -13,6 +14,19 @@ interface InfoModalProps {
 type ActiveTab = 'changelog' | 'about';
 
 const changelogData = [
+    {
+        version: '1.15.5',
+        date: new Date('2024-09-11T10:00:00'),
+        changes: [
+            { type: 'fix', text: "Corregido el menú contextual de los objetos de dibujo, permitiendo crear 'enjambres' desde cualquier rectángulo sin necesidad de estar en modo de edición." },
+            { type: 'feat', text: "Añadidos controles de opacidad para el relleno y el borde de las formas en la pestaña 'Dibujo'." },
+            { type: 'feat', text: "El tiempo estimado de los nodos ahora es visible en el lienzo." },
+            { type: 'ux', text: "Movido el botón 'Reorganizar Orden' a la pestaña 'Herramientas' para una mejor organización." },
+            { type: 'ux', text: "Ahora se puede hacer doble clic en el icono de un nodo en la ventana de edición para abrir directamente el selector de iconos." },
+            { type: 'style', text: "Reducido el tamaño de los botones de 'Anclar' y 'Eliminar' en los nodos para una interfaz más limpia." },
+            { type: 'fix', text: "Corregido un error que impedía la visualización de los iconos en los nodos de lógica Y/O (AND/OR)." },
+        ],
+    },
     {
         version: '1.15.4',
         date: new Date('2024-09-10T10:00:00'),
