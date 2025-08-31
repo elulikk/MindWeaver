@@ -45,7 +45,7 @@ export const computeDerivedState = (nodes: Node[], mininodes: Mininode[], connec
     return { nodesById, mininodesById, mininodesByParentId, canvasObjectsById, nodeStatus: statusMap, isDarkTheme: true };
 };
     
-const coreStateKeys: (keyof MindMapCoreState)[] = ['nodes', 'mininodes', 'connections', 'canvasObjects', 'nodeColor', 'backgroundColor', 'gridColor', 'canvasTitle', 'showMininodePreviews', 'checkboxPosition', 'contextMenuEnabled', 'defaultEditorMode', 'autosaveEnabled'];
+const coreStateKeys: (keyof MindMapCoreState)[] = ['uuid', 'nodes', 'mininodes', 'connections', 'canvasObjects', 'nodeColor', 'backgroundColor', 'gridColor', 'canvasTitle', 'showMininodePreviews', 'checkboxPosition', 'contextMenuEnabled', 'defaultEditorMode', 'autosaveEnabled'];
 export const getCoreState = (state: Omit<MindMapState, 'actions'>): MindMapCoreState => {
     return coreStateKeys.reduce((acc, key) => {
         acc[key] = state[key];

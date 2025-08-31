@@ -85,6 +85,7 @@ export default {
         export: 'Export As...',
         exportTooltip: 'Save a copy of the project',
         exportAsJson: 'to JSON',
+        exportAsPdf: 'as PDF',
         exportAsHtml: 'as HTML',
         // Language
         language: 'Language',

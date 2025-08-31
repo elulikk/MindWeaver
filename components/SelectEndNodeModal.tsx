@@ -13,7 +13,16 @@ const SelectEndNodeModal: React.FC = () => {
 
     if (activeModal?.type !== 'selectEndNode') return null;
 
-    const { endNodes } = activeModal;
+    const { endNodes, exportType } = activeModal;
+
+    const handleExport = (nodeId: number | null) => {
+        if (exportType === 'pdf') {
+            actions.exportToPdf(nodeId);
+        } else {
+            // Default to HTML for safety
+            actions.exportToHtml(nodeId);
+        }
+    };
 
     return (
         <>
@@ -32,7 +41,7 @@ const SelectEndNodeModal: React.FC = () => {
                         {endNodes.map(node => (
                             <button
                                 key={node.id}
-                                onClick={() => actions.exportToHtml(node.id)}
+                                onClick={() => handleExport(node.id)}
                                 className="w-full text-left p-3 rounded-md transition-colors flex items-center gap-3 bg-slate-700/50 hover:bg-slate-700"
                             >
                                 <Icon icon="node-finish" className="w-6 h-6 flex-shrink-0 text-red-500" />
@@ -43,7 +52,7 @@ const SelectEndNodeModal: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center gap-3 p-4 border-t border-slate-700">
                      <button
-                        onClick={() => actions.exportToHtml(null)}
+                        onClick={() => handleExport(null)}
                         className="px-4 py-2 font-semibold rounded-md transition text-slate-300 bg-slate-700 hover:bg-slate-600"
                     >
                         Exportar Proyecto Completo

@@ -82,6 +82,8 @@ export const createStateActions = (set: SetState, get: GetState) => ({
             // Create new project (from a file or a new canvas)
             try {
                 const newProject = {
+                    // FIX: Added missing uuid property to conform to Project type for db.projects.add
+                    uuid: coreState.uuid,
                     title: coreState.canvasTitle || 'Nuevo Proyecto',
                     state: coreState,
                     modifiedAt: new Date(),

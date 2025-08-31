@@ -377,6 +377,12 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
                             onDragEnd={(e) => { e.stopPropagation(); actions.setDraggedMininodeInfo(null); }}
                             onDoubleClick={(e) => { e.stopPropagation(); onMininodeDoubleClick(mn); }}
                             onClick={() => setActiveMininodeId(mn.id)}
+                            onContextMenu={(e) => {
+                                if (!contextMenuEnabled || drawingMode) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                actions.openContextMenu({ type: 'mininode', targetId: mn.id, x: e.clientX, y: e.clientY });
+                            }}
                             className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs transition-colors border ${activeMininodeId === mn.id ? 'bg-cyan-800/50 border-cyan-600' : 'bg-zinc-700/60 border-transparent hover:bg-zinc-600/80'}`}
                             title={mn.title}
                         >

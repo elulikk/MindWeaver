@@ -257,6 +257,7 @@ const RibbonToolbar: React.FC = () => {
                         {isExportMenuOpen && (
                             <div className={`absolute right-0 top-full mt-1 w-52 rounded-lg shadow-xl border p-2 space-y-1 z-10 ${colors.background}`}>
                                 <DropdownMenuItem onClick={() => { actions.exportToFile('json'); setIsExportMenuOpen(false); }} icon="json">{t('ribbon.exportAsJson')}</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => { actions.exportToPdf(); setIsExportMenuOpen(false); }} icon="pdf">{t('ribbon.exportAsPdf')}</DropdownMenuItem>
                                 <div className={`my-1 h-px ${colors.separator}`}></div>
                                 <DropdownMenuItem onClick={() => { actions.exportToHtml(); setIsExportMenuOpen(false); }} icon="html">{t('ribbon.exportAsHtml')}</DropdownMenuItem>
                             </div>

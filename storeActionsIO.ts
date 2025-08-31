@@ -7,6 +7,8 @@ import JSZip from 'jszip';
 import { db } from './db';
 import { sanitizeAndMigrateState } from './storeMigrations';
 import { getCoreState } from './storeUtils';
+import { jsPDF } from 'jspdf';
+
 
 type SetState = (partial: Partial<MindMapState> | ((state: MindMapState) => Partial<MindMapState>)) => void;
 type GetState = () => MindMapState;
@@ -25,11 +27,16 @@ const processAndLoadFile = async (set: SetState, get: GetState, fileContent: str
         const data = JSON.parse(fileContent) as Partial<SaveData>;
         const sanitizedState = sanitizeAndMigrateState(data);
         
+        if (!sanitizedState.uuid) {
+            sanitizedState.uuid = crypto.randomUUID();
+        }
+        
         const newProject = {
             title: getFileName(file.name),
             state: sanitizedState,
             modifiedAt: new Date(),
             icon: data.icon || 'brain',
+            uuid: sanitizedState.uuid,
         };
         const newId = await db.projects.add(newProject);
 
@@ -50,7 +57,50 @@ const processAndLoadFile = async (set: SetState, get: GetState, fileContent: str
 };
 
 const generateHtmlForNodes = (nodesToExport: Node[], canvasTitle: string, mininodesByParentId: MindMapState['mininodesByParentId']): string => {
-    let htmlContent = `
+    // Generate Index HTML
+    const indexHtml = `
+        <div class="index-card">
+            <h2 id="index">Índice</h2>
+            <ol class="index-nav">
+                ${nodesToExport.map(node => `
+                    <li><a href="#node-${node.id}">${node.orderIndex}. ${node.title}</a></li>
+                `).join('')}
+            </ol>
+        </div>
+    `;
+
+    // Generate Main Content HTML
+    let mainContentHtml = '';
+    for (const node of nodesToExport) {
+        const descriptionHtml = marked.parse(node.description || '');
+        const mininodes = mininodesByParentId[node.id] || [];
+        
+        mainContentHtml += `
+            <details class="node" open>
+                <summary class="node-header" id="node-${node.id}">
+                    <h2>${node.orderIndex}. ${node.title}</h2>
+                </summary>
+                <div class="node-content" style="border-left: 5px solid ${node.color};">
+                    <div class="markdown-content">${descriptionHtml}</div>
+                    ${mininodes.length > 0 ? `
+                    <div class="mininodes-section">
+                        ${mininodes.map(mn => `
+                        <details class="mininode">
+                            <summary class="mininode-header">${mn.title}</summary>
+                            <div class="markdown-content"><pre><code>${mn.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre></div>
+                        </details>
+                        `).join('')}
+                    </div>` : ''}
+                    <div class="back-to-top-container">
+                        <a href="#index" class="back-to-top">▲ Volver al Índice</a>
+                    </div>
+                </div>
+            </details>
+        `;
+    }
+
+    // Combine all parts into the final HTML
+    const htmlContent = `
     <!DOCTYPE html>
     <html lang="es">
     <head>
@@ -58,50 +108,113 @@ const generateHtmlForNodes = (nodesToExport: Node[], canvasTitle: string, minino
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${canvasTitle}</title>
         <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #e4e4e7; background-color: #18181b; margin: 0; padding: 2rem; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+                line-height: 1.6; 
+                color: #e4e4e7; 
+                background-color: #18181b; 
+                margin: 0; 
+                padding: 2rem; 
+                scroll-behavior: smooth;
+            }
             .container { max-width: 800px; margin: 0 auto; }
-            .node { border: 1px solid #3f3f46; border-radius: 8px; margin-bottom: 2rem; padding: 1.5rem; background-color: #27272a; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-            h1, h2 { color: #22d3ee; border-bottom: 1px solid #3f3f46; padding-bottom: 0.5rem; }
-            h1 { font-size: 2.5em; text-align: center; margin-bottom: 2rem; border: none; }
-            h2 { font-size: 1.8em; }
+            h1 { font-size: 2.5em; text-align: center; margin-bottom: 2rem; color: #22d3ee; border: none; }
+            h2 { font-size: 1.8em; color: #22d3ee; margin-top: 0; margin-bottom: 0.5rem; }
+            
+            /* Node styles */
+            .node { margin-bottom: 1rem; }
+            .node-header {
+                padding: 1rem;
+                background-color: #27272a;
+                border: 1px solid #3f3f46;
+                border-radius: 8px;
+                cursor: pointer;
+                list-style: none; /* Hide default arrow */
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: background-color 0.2s;
+            }
+            .node-header::-webkit-details-marker { display: none; }
+            .node-header:hover { background-color: #3f3f46; }
+            .node-header::before {
+                content: '►';
+                font-size: 0.8em;
+                margin-right: 0.75rem;
+                transition: transform 0.2s;
+                color: #a1a1aa;
+            }
+            .node[open] > .node-header::before {
+                transform: rotate(90deg);
+            }
+            .node[open] > .node-header {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-color: transparent;
+            }
+            .node-content {
+                border: 1px solid #3f3f46;
+                border-top: none;
+                border-radius: 0 0 8px 8px;
+                padding: 1.5rem;
+                background-color: #27272a;
+            }
+            
+            /* Markdown content inside nodes */
+            .markdown-content h2 { border-bottom: 1px solid #3f3f46; padding-bottom: 0.5rem; }
             code { background-color: #3f3f46; color: #a1a1aa; padding: 0.2em 0.4em; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
             pre { background-color: #3f3f46; padding: 1em; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }
             pre code { background-color: transparent; padding: 0; }
             blockquote { border-left: 4px solid #71717a; padding-left: 1em; color: #a1a1aa; }
-            a { color: #67e8f9; }
+            a { color: #67e8f9; text-decoration: none; }
+            a:hover { text-decoration: underline; }
             hr { border-color: #52525b; margin: 1.5em 0; }
+            
+            /* Mininode styles */
             .mininodes-section { margin-top: 1.5rem; }
             .mininode { border: 1px dashed #52525b; border-radius: 6px; margin-top: 1rem; }
-            .mininode-header { background-color: #3f3f46; padding: 0.5rem 1rem; font-family: monospace; font-weight: bold; border-top-left-radius: 5px; border-top-right-radius: 5px;}
+            .mininode[open] { border-style: solid; }
+            .mininode-header { 
+                background-color: #3f3f46; 
+                padding: 0.5rem 1rem; 
+                font-family: monospace; 
+                font-weight: bold; 
+                border-top-left-radius: 5px; 
+                border-top-right-radius: 5px;
+                cursor: pointer;
+                list-style: none; /* Hide default arrow */
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: background-color 0.2s;
+            }
+            .mininode-header:hover { background-color: #52525b; }
+            .mininode-header::-webkit-details-marker { display: none; }
+            .mininode-header::before {
+                content: '►';
+                font-size: 0.8em;
+                transition: transform 0.2s;
+            }
+            .mininode[open] > .mininode-header::before {
+                transform: rotate(90deg);
+            }
+            .mininode > .markdown-content { padding: 1rem; }
+            
+            /* Index styles */
+            .index-card { background-color: #27272a; border: 1px solid #3f3f46; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 3rem; }
+            .index-nav { padding-left: 1.5rem; }
+            .index-nav li { margin-bottom: 0.5rem; }
+            
+            /* Back to top styles */
+            .back-to-top-container { text-align: right; margin-top: 1.5rem; }
+            .back-to-top { font-size: 0.9em; color: #a1a1aa; }
         </style>
     </head>
     <body>
         <div class="container">
             <h1>${canvasTitle}</h1>
-    `;
-    
-    for (const node of nodesToExport) {
-        const descriptionHtml = marked.parse(node.description || '');
-        const mininodes = mininodesByParentId[node.id] || [];
-        
-        htmlContent += `
-            <div class="node" style="border-left: 5px solid ${node.color};">
-                <h2>${node.orderIndex}. ${node.title}</h2>
-                <div class="markdown-content">${descriptionHtml}</div>
-                ${mininodes.length > 0 ? `
-                <div class="mininodes-section">
-                    ${mininodes.map(mn => `
-                    <div class="mininode">
-                        <div class="mininode-header">${mn.title}</div>
-                        <div class="markdown-content"><pre><code>${mn.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre></div>
-                    </div>
-                    `).join('')}
-                </div>` : ''}
-            </div>
-    `;
-    }
-    
-    htmlContent += `
+            ${indexHtml}
+            ${mainContentHtml}
         </div>
     </body>
     </html>
@@ -109,6 +222,7 @@ const generateHtmlForNodes = (nodesToExport: Node[], canvasTitle: string, minino
 
     return htmlContent;
 };
+
 
 const triggerDownload = (blob: Blob, filename: string) => {
     const link = document.createElement('a');
@@ -121,6 +235,7 @@ const triggerDownload = (blob: Blob, filename: string) => {
 };
 
 
+// FIX: Corrected the type for the 'set' parameter from GetState to SetState.
 export const createIOActions = (set: SetState, get: GetState) => ({
     saveSettings: (newSettings: any) => {
         const { actions } = get();
@@ -162,7 +277,7 @@ export const createIOActions = (set: SetState, get: GetState) => ({
 
         // 2. If no endNodeId is provided and there are multiple end nodes, open modal
         if (endNodeId === undefined && endNodes.length > 1) {
-            actions.openModal({ type: 'selectEndNode', endNodes });
+            actions.openModal({ type: 'selectEndNode', endNodes, exportType: 'html' });
             return; // Stop execution, wait for user choice
         }
 
@@ -287,6 +402,167 @@ export const createIOActions = (set: SetState, get: GetState) => ({
             set({ isLoading: false });
         }
     },
+    exportToPdf: async (endNodeId?: number | null) => {
+        const { nodes, connections, canvasTitle, mininodesByParentId, actions } = get();
+
+        const outgoingConnections = new Map<number, number>();
+        for (const conn of connections) {
+            outgoingConnections.set(conn.fromNode, (outgoingConnections.get(conn.fromNode) || 0) + 1);
+        }
+        const endNodes = nodes.filter(node => (outgoingConnections.get(node.id) || 0) === 0);
+
+        if (endNodeId === undefined && endNodes.length > 1) {
+            actions.openModal({ type: 'selectEndNode', endNodes, exportType: 'pdf' });
+            return;
+        }
+
+        if (endNodeId === null) {
+            endNodeId = undefined;
+        }
+
+        set({ isLoading: 'Generando PDF...' });
+
+        try {
+            let nodesToProcess = nodes;
+            let exportTitle = canvasTitle;
+
+            if (endNodeId) {
+                const getAncestors = (startNodeId: number): Set<number> => {
+                    const ancestors = new Set<number>([startNodeId]);
+                    const queue: number[] = [startNodeId];
+                    while (queue.length > 0) {
+                        const curr = queue.shift()!;
+                        connections.forEach(c => {
+                            if (c.toNode === curr && !ancestors.has(c.fromNode)) {
+                                ancestors.add(c.fromNode);
+                                queue.push(c.fromNode);
+                            }
+                        });
+                    }
+                    return ancestors;
+                };
+                const ancestorIds = getAncestors(endNodeId);
+                nodesToProcess = nodes.filter(n => ancestorIds.has(n.id));
+                const endNodeTitle = nodes.find(n => n.id === endNodeId)?.title || '';
+                exportTitle = `${canvasTitle} (Flujo: ${endNodeTitle})`;
+            }
+            
+            const sortedNodes = [...nodesToProcess].sort((a, b) => a.orderIndex - b.orderIndex);
+            const nodesToExport = sortedNodes.map((node, index) => ({ ...node, orderIndex: index + 1 }));
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const margin = 15;
+            const maxLineWidth = pageWidth - margin * 2;
+            let y = margin;
+
+            const addPageNumbers = () => {
+                const pageCount = pdf.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(150);
+                    pdf.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                }
+            };
+
+            const checkPageBreak = (neededHeight: number) => {
+                if (y + neededHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    y = margin;
+                }
+            };
+
+            // Title Page
+            pdf.setFontSize(24);
+            pdf.setTextColor(40);
+            pdf.text(exportTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+            
+            pdf.addPage();
+            y = margin;
+
+            for (const node of nodesToExport) {
+                // Node Title
+                checkPageBreak(12);
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(0);
+                const titleLines = pdf.splitTextToSize(`${node.orderIndex}. ${node.title}`, maxLineWidth);
+                pdf.text(titleLines, margin, y);
+                y += titleLines.length * 7;
+
+                y += 4; // Spacing
+
+                // Node Description
+                if (node.description) {
+                    checkPageBreak(10);
+                    pdf.setFontSize(11);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(50);
+                    const plainTextDescription = marked.parse(node.description)
+                        .replace(/<[^>]*>/g, '') // strip html tags
+                        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+
+                    const descriptionLines = pdf.splitTextToSize(plainTextDescription, maxLineWidth);
+                    
+                    for(const line of descriptionLines) {
+                        checkPageBreak(6);
+                        pdf.text(line, margin, y);
+                        y += 6;
+                    }
+                }
+
+                // Mininodes
+                const mininodes = mininodesByParentId[node.id] || [];
+                if (mininodes.length > 0) {
+                    y += 6;
+                    checkPageBreak(10);
+
+                    for (const mn of mininodes) {
+                        checkPageBreak(12);
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(30);
+                        pdf.text(`Diente: ${mn.title}`, margin, y);
+                        y += 7;
+
+                        if (mn.content) {
+                            checkPageBreak(10);
+                            pdf.setFontSize(9);
+                            pdf.setFont('courier', 'normal');
+                            pdf.setTextColor(80);
+                            pdf.setFillColor(240, 240, 240);
+                            
+                            const codeLines = pdf.splitTextToSize(mn.content, maxLineWidth - 10);
+                            
+                            const rectHeight = codeLines.length * 4 + 4;
+                            checkPageBreak(rectHeight);
+                            pdf.rect(margin, y - 4, maxLineWidth, rectHeight, 'F');
+                            
+                            pdf.text(codeLines, margin + 2, y);
+                            y += codeLines.length * 4 + 4;
+                        }
+                    }
+                }
+                y += 15; // Space between nodes
+            }
+
+            addPageNumbers();
+
+            const filename = `${getFileName(canvasTitle)}.pdf`;
+            pdf.save(filename);
+
+            actions._addLog(`Proyecto exportado como ${filename}.`, 'success');
+            actions.closeModal();
+
+        } catch (error) {
+            console.error("PDF Export failed", error);
+            actions._addLog('Error al exportar a PDF.', 'error');
+        } finally {
+            set({ isLoading: false });
+        }
+    },
     exportSelectionToHtml: async () => {
         set({ isLoading: 'Exportando selección...' });
         const { nodes, selectedNodeIds, canvasTitle, mininodesByParentId, actions } = get();
@@ -320,13 +596,52 @@ export const createIOActions = (set: SetState, get: GetState) => ({
         const { actions } = get();
         const fileContent = await file.text();
         try {
-            const data = JSON.parse(fileContent);
+            const data = JSON.parse(fileContent) as Partial<SaveData>;
+            
+            // Sanitize first to get a guaranteed UUID and consistent state object
+            const sanitizedState = sanitizeAndMigrateState(data);
+
+            let existingProject;
+            // If the original file had a UUID, use it for conflict detection.
+            if (data.uuid) {
+                existingProject = await db.projects.where('uuid').equals(data.uuid).first();
+            } else {
+                // For legacy files without a UUID, fall back to checking by title.
+                // This is not foolproof but is the best effort for backward compatibility.
+                const potentialMatches = await db.projects.where('title').equals(sanitizedState.canvasTitle).toArray();
+                if (potentialMatches.length > 0) {
+                    // If multiple matches exist, pick the most recently modified one.
+                    existingProject = potentialMatches.sort((a, b) => b.modifiedAt.getTime() - a.modifiedAt.getTime())[0];
+                }
+            }
+            
+            if (existingProject) {
+                const existingProjectSize = new Blob([JSON.stringify(existingProject.state)]).size;
+                
+                actions.openModal({
+                    type: 'projectConflict',
+                    existingProject: {
+                        id: existingProject.id!,
+                        uuid: existingProject.uuid,
+                        title: existingProject.title,
+                        modifiedAt: existingProject.modifiedAt,
+                        size: existingProjectSize,
+                    },
+                    importedState: sanitizedState,
+                    importedFile: file,
+                });
+                return; // Stop processing, wait for user decision
+            }
+
+            // If no conflict, but it's an old version, ask for confirmation to migrate.
             if (data.schemaVersion !== SCHEMA_VERSION) {
                 actions.openModal({ type: 'confirmImport', fileContent, file });
             } else {
+                // No conflict and up-to-date, process directly.
                 await processAndLoadFile(set, get, fileContent, file);
             }
         } catch (e) {
+            // If JSON parsing fails or any other error, assume it's an old/invalid format.
             actions.openModal({ type: 'confirmImport', fileContent, file });
         }
     },
@@ -338,6 +653,28 @@ export const createIOActions = (set: SetState, get: GetState) => ({
         const { fileContent, file } = activeModal;
         await processAndLoadFile(set, get, fileContent, file);
         actions.closeModal();
+    },
+    confirmProjectConflict: async (choice: 'overwrite' | 'keepLocal') => {
+        const { activeModals, actions } = get();
+        const modal = activeModals[activeModals.length - 1];
+        if (modal?.type !== 'projectConflict') return;
+
+        actions.closeModal();
+
+        if (choice === 'overwrite') {
+            const { existingProject, importedState } = modal;
+            await db.projects.update(existingProject.id, {
+                state: importedState,
+                title: importedState.canvasTitle,
+                modifiedAt: new Date(),
+                uuid: importedState.uuid, // Ensure UUID is updated
+            });
+            await actions.loadProjects();
+            await actions.loadProject(existingProject.id);
+            actions._addLog(`Proyecto '${existingProject.title}' sobrescrito con la versión importada.`, 'success');
+        } else { // 'keepLocal' or 'cancel'
+            actions._addLog('Importación cancelada. Se conservó la versión existente.', 'info');
+        }
     },
     loadState: (stateToLoad: Partial<MindMapCoreState>) => {
         get().actions._updateState({

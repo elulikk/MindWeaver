@@ -47,6 +47,7 @@ export const sanitizeAndMigrateState = (data: Partial<SaveData>): MindMapCoreSta
     const canvasObjects = (data.canvasObjects || []).filter(o => o && o.id && o.type);
 
     return {
+        uuid: data.uuid || crypto.randomUUID(), // Preserve existing UUID or generate a new one
         nodes,
         mininodes,
         connections,

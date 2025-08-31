@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Icon } from './Icon';
 
@@ -12,6 +13,27 @@ interface InfoModalProps {
 type ActiveTab = 'changelog' | 'about';
 
 const changelogData = [
+    {
+        version: '1.18.0',
+        date: new Date('2024-09-15T10:00:00'),
+        changes: [
+            { type: 'feat', text: "Añadido un algoritmo de detección de similitud para identificar posibles proyectos duplicados basándose en el título, tamaño, fecha, icono y número de nodos." },
+            { type: 'feat', text: "El Explorador de Proyectos ahora marca automáticamente los proyectos similares con un icono de advertencia y un botón para 'Revisar Duplicados'." },
+            { type: 'feat', text: "Implementado un nuevo modal de 'Unificar Proyectos' que permite comparar y fusionar duplicados seleccionando la versión a conservar." },
+            { type: 'refactor', text: "Integrada la lógica de detección de similitud en el proceso de carga de proyectos para una verificación automática." },
+            { type: 'ux', text: "Mejorada la gestión de proyectos al proporcionar un flujo de trabajo claro para limpiar duplicados, especialmente los de versiones antiguas." },
+        ],
+    },
+    {
+        version: '1.17.0',
+        date: new Date('2024-09-14T10:00:00'),
+        changes: [
+            { type: 'feat', text: "Añadida la funcionalidad de exportación a PDF, generando un documento de texto limpio, seleccionable y profesional." },
+            { type: 'refactor', text: "Reconstruida la exportación a PDF para ser nativa de texto, eliminando la dependencia de `html2canvas` para mejorar la calidad y reducir el tamaño del archivo." },
+            { type: 'fix', text: "Corregido un error en el diálogo de selección de flujo de exportación que siempre exportaba a HTML, ignorando la selección de PDF." },
+            { type: 'ux', text: "La exportación a PDF ahora maneja correctamente proyectos con múltiples finales, al igual que la exportación a HTML." },
+        ],
+    },
     {
         version: '1.16.0',
         date: new Date('2024-09-13T10:00:00'),

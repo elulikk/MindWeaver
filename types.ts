@@ -2,6 +2,7 @@
 
 import type { IconName as UIIconName } from './components/icons';
 import { Language } from './components/locales/i18n';
+import type { DBProject } from './db';
 
 export { Language };
 
@@ -62,6 +63,14 @@ export interface Connection {
 
 export type HelpTab = 'navigation' | 'nodes' | 'markdown' | 'projects' | 'shortcuts' | 'html';
 
+export interface ProjectConflictInfo {
+    id: number;
+    uuid: string;
+    title: string;
+    modifiedAt: Date;
+    size: number;
+}
+
 export type ActiveModal =
   | { type: 'edit'; node: Node }
   | { type: 'editMininode'; mininode: Mininode }
@@ -72,8 +81,10 @@ export type ActiveModal =
   | { type: 'confirmMarkAllIncomplete' }
   | { type: 'deleteProject'; projectId: number }
   | { type: 'deleteMininode'; mininodeId: number }
-  | { type: 'selectEndNode'; endNodes: Node[] }
+  | { type: 'selectEndNode'; endNodes: Node[]; exportType: 'html' | 'pdf' }
   | { type: 'confirmImport'; fileContent: string; file: File; }
+  | { type: 'projectConflict'; existingProject: ProjectConflictInfo; importedState: MindMapCoreState; importedFile: File; }
+  | { type: 'unifyProjects'; projectGroup: DBProject[] }
   | { type: 'help'; initialTab?: HelpTab }
   | { type: 'info' }
   | { type: 'projectIconPicker', projectId: number }
@@ -89,6 +100,7 @@ export interface ClipboardData {
 
 export interface Project {
     id: number;
+    uuid: string;
     title: string;
     modifiedAt: Date;
     icon?: IconName;
@@ -153,6 +165,7 @@ export type CanvasObject = CanvasObjectText | CanvasObjectShape | CanvasObjectLi
 
 // The core state of the mind map that we want to track for undo/redo
 export interface MindMapCoreState {
+  uuid: string;
   nodes: Node[];
   mininodes: Mininode[];
   connections: Connection[];
@@ -238,6 +251,7 @@ export interface MindMapState extends MindMapCoreState {
   userTemplates: UserTemplate[];
   currentProjectId: number | null;
   panelStates: Record<string, PanelState>;
+  similarProjectGroups: number[][];
 
   // Log Panel State
   isLogPanelOpen: boolean;
@@ -323,9 +337,11 @@ export interface AppActions {
     saveSettings: (newSettings: Settings) => void;
     exportToFile: (format: 'json') => void;
     exportToHtml: (endNodeId?: number | null) => Promise<void>;
+    exportToPdf: (endNodeId?: number | null) => Promise<void>;
     exportSelectionToHtml: () => Promise<void>;
     importFromFile: (file: File) => void;
     confirmImport: () => Promise<void>;
+    confirmProjectConflict: (choice: 'overwrite' | 'keepLocal') => Promise<void>;
     loadState: (state: Partial<MindMapCoreState>) => void;
     copySelection: () => void;
     pasteFromClipboard: () => void;
@@ -361,6 +377,10 @@ export interface AppActions {
     confirmDeleteProject: () => Promise<void>;
     setPanelState: (panelId: string, newState: Partial<PanelState>) => void;
     updateProjectIcon: (projectId: number, icon: IconName | undefined) => Promise<void>;
+    findSimilarProjects: () => Promise<void>;
+    requestUnifyProjects: (projectId: number) => void;
+    confirmUnifyProjects: (options: { projectToKeepId: number; projectGroupId: number[] }) => Promise<void>;
+
     // Template Actions
     loadUserTemplates: () => Promise<void>;
     importAsTemplate: (file: File) => Promise<void>;

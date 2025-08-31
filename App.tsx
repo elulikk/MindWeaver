@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useEffect, useState, useMemo, useLayoutEffect } from 'react';
 import { useMindMapStore } from './store';
 import NodeComponent from './components/NodeComponent';
@@ -10,6 +11,8 @@ import ConfirmDeleteModal from './components/ConfirmDeleteModal';
 import ConfirmNewCanvasModal from './components/ConfirmNewCanvasModal';
 import ConfirmMarkAllIncompleteModal from './components/ConfirmMarkAllIncompleteModal';
 import ConfirmImportModal from './components/ConfirmImportModal';
+import ConfirmProjectConflictModal from './components/ConfirmProjectConflictModal';
+import ConfirmUnifyProjectsModal from './components/ConfirmUnifyProjectsModal';
 import SelectEndNodeModal from './components/SelectEndNodeModal';
 import ProjectExplorer from './components/ProjectExplorer';
 import LogPanel from './components/LogPanel';
@@ -28,7 +31,7 @@ import { useTranslations } from './components/locales/i18n';
 
 const VIRTUAL_CANVAS_SIZE = 10000;
 const PORT_OFFSET = 8;
-const APP_VERSION = '1.15.6';
+const APP_VERSION = '1.18.0';
 
 const ContextMenu = () => {
     const t = useTranslations();
@@ -424,6 +427,8 @@ const App: React.FC = () => {
       case 'confirmNew': return <ConfirmNewCanvasModal onConfirm={actions.addNewProject} onClose={actions.closeModal} />;
       case 'confirmMarkAllIncomplete': return <ConfirmMarkAllIncompleteModal onConfirm={actions.confirmMarkAllIncomplete} onClose={actions.closeModal} />;
       case 'confirmImport': return <ConfirmImportModal onConfirm={actions.confirmImport} onClose={actions.closeModal} />;
+      case 'projectConflict': return <ConfirmProjectConflictModal existingProjectInfo={activeModal.existingProject} importedFile={activeModal.importedFile} importedState={activeModal.importedState} onConfirm={actions.confirmProjectConflict} onClose={actions.closeModal} />;
+      case 'unifyProjects': return <ConfirmUnifyProjectsModal projectGroup={activeModal.projectGroup} />;
       case 'selectEndNode': return <SelectEndNodeModal />;
       case 'help': return <HelpModal onClose={actions.closeModal} isDarkTheme={isDarkTheme} initialTab={activeModal.initialTab} />;
       case 'info': return <InfoModal onClose={actions.closeModal} isDarkTheme={isDarkTheme} version={APP_VERSION} schemaVersion={SCHEMA_VERSION} />;
@@ -518,6 +523,13 @@ const App: React.FC = () => {
             }
           }}
         >
+          {/* Glow effect for drawing mode */}
+          {drawingMode && (
+              <div className="absolute inset-0 pointer-events-none z-10" style={{
+                  boxShadow: 'inset 0 0 25px 8px rgba(250, 204, 21, 0.3)'
+              }} />
+          )}
+
           {/* Grid background */}
           <div className="absolute inset-0 pointer-events-none" style={{
               backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
@@ -564,6 +576,7 @@ const App: React.FC = () => {
                     selectedObjectIds={selectedCanvasObjectIds}
                     drawingMode={drawingMode}
                     actions={actions}
+                    focusModeEnabled={focusModeEnabled}
                 />
                 {visibleConnections.map((conn) => {
                     const fromNode = nodesById[conn.fromNode];
@@ -605,8 +618,8 @@ const App: React.FC = () => {
             </div>
           </div>
           
-            <div className="absolute bottom-2 right-2 flex items-center gap-4 text-xs text-zinc-600 dark:text-zinc-400">
-                <span className="opacity-50 pointer-events-none">{t('app.devBy')}</span>
+            <div className="absolute bottom-2 right-2 text-xs text-zinc-600 dark:text-zinc-400 opacity-50 pointer-events-none">
+                <span>Mind Weaver v{APP_VERSION} - {t('app.devBy')}</span>
             </div>
 
           {isLoading && (

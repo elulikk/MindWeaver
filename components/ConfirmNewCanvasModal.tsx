@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useRef, useState } from 'react';
 import { ProjectTemplate, MindMapCoreState, IconName } from '../types';
 import { Icon } from './Icon';
@@ -11,7 +12,7 @@ interface ConfirmNewCanvasModalProps {
 
 const builtInTemplates: { key: ProjectTemplate; title: string; description: string; icon: React.ComponentProps<typeof Icon>['icon'] }[] = [
     { key: 'empty', title: 'Proyecto Vacío', description: 'Empieza desde cero con un lienzo en blanco.', icon: 'new-canvas' },
-    { key: 'coffee', title: 'Cómo Hacer Café', description: 'Una plantilla de ejemplo para un tutorial simple.', icon: 'template-coffee' },
+    { key: 'coffee', title: 'Ejemplo Simple: Hacer Cafe', description: 'Una plantilla detallada sobre cómo preparar café.', icon: 'template-coffee' },
     { key: 'electron-compilation', title: 'Compilar App con Electron', description: 'Guía detallada para compilar y empaquetar una app de escritorio.', icon: 'template-electron' },
 ];
 

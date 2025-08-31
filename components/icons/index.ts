@@ -48,6 +48,6 @@ export const categorizedIcons: Record<string, IconName[]> = {
   "Nodos y Flujo": [ 'brain', 'workflow', 'general', 'node-normal', 'node-start', 'node-finish', 'node-and', 'node-or', 'node-empty', 'start-flag', 'end-flag' ],
   "General y UI": [ 'add', 'minus', 'delete', 'close', 'check', 'settings', 'warning', 'help', 'markdown-help', 'changelog', 'undo', 'redo', 'copy', 'paste', 'import', 'export', 'download', 'new-canvas', 'send', 'hide', 'clear', 'drag-handle', 'frame', 'theme', 'save', 'explorer', 'log', 'pin-on', 'pin-off', 'chevron-left', 'chevron-right', 'chatbot', 'mark-all-incomplete', 'wifi', 'filter', 'focus-mode', 'time', 'limpiar', 'abrir-local', 'language', 'spain-flag', 'uk-flag', 'star'],
   "Formato": [ 'bold', 'italic', 'underline', 'strikethrough', 'code-block', 'link', 'blockquote', 'list-ul', 'list-ol', 'hr', 'table', 'text', 'align-left', 'align-center', 'align-right' ],
-  "Desarrollo y Datos": [ 'terminal', 'code', 'script', 'python', 'postgresql', 'json', 'html', 'xml', 'csv', 'excel', 'cuda', 'microsoft', 'nodejs' ],
+  "Desarrollo y Datos": [ 'terminal', 'code', 'script', 'python', 'postgresql', 'json', 'html', 'xml', 'csv', 'excel', 'cuda', 'microsoft', 'nodejs', 'pdf' ],
   "Dibujo": [ 'pointer-edit', 'shape-square', 'shape-circle', 'shape-line', 'arrow-start', 'arrow-end', 'fill-opacity', 'stroke-opacity' ],
 };

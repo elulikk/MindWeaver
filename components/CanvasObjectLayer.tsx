@@ -7,11 +7,15 @@ interface CanvasObjectLayerProps {
     selectedObjectIds: Set<string>;
     drawingMode: DrawingTool | null;
     actions: AppActions;
+    focusModeEnabled: boolean;
 }
 
-const CanvasObjectComponent: React.FC<{ object: CanvasObject; isSelected: boolean, drawingMode: DrawingTool | null, actions: AppActions }> = ({ object, isSelected, drawingMode, actions }) => {
+const CanvasObjectComponent: React.FC<{ object: CanvasObject; isSelected: boolean, drawingMode: DrawingTool | null, actions: AppActions, focusModeEnabled: boolean }> = ({ object, isSelected, drawingMode, actions, focusModeEnabled }) => {
     const isEditMode = drawingMode === 'edit';
     const objectCursor = isEditMode ? 'move' : 'default';
+    const isFaded = focusModeEnabled;
+    const fadeClasses = isFaded ? 'opacity-20 hover:opacity-100 transition-opacity duration-300' : '';
+
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (isEditMode) {
@@ -33,7 +37,7 @@ const CanvasObjectComponent: React.FC<{ object: CanvasObject; isSelected: boolea
             };
 
             return (
-                <g>
+                <g className={fadeClasses}>
                     <rect
                         x={shape.pos.x} y={shape.pos.y}
                         width={shape.size.width} height={shape.size.height}
@@ -69,12 +73,12 @@ const CanvasObjectComponent: React.FC<{ object: CanvasObject; isSelected: boolea
                 onMouseDown: handleMouseDown,
                 style: { cursor: objectCursor },
             };
-            return <ellipse cx={shape.pos.x + shape.size.width / 2} cy={shape.pos.y + shape.size.height / 2} rx={shape.size.width / 2} ry={shape.size.height / 2} {...commonProps} />;
+            return <ellipse cx={shape.pos.x + shape.size.width / 2} cy={shape.pos.y + shape.size.height / 2} rx={shape.size.width / 2} ry={shape.size.height / 2} {...commonProps} className={fadeClasses} />;
         }
         case 'line': {
             const line = object as CanvasObjectLine;
             return (
-                <g data-object-id={line.id} onMouseDown={handleMouseDown} style={{ cursor: objectCursor }}>
+                <g data-object-id={line.id} onMouseDown={handleMouseDown} style={{ cursor: objectCursor }} className={fadeClasses}>
                     {/* Wider transparent line for easier selection */}
                     <line x1={line.start.x} y1={line.start.y} x2={line.end.x} y2={line.end.y} stroke="transparent" strokeWidth="12" />
                     <line 
@@ -94,7 +98,7 @@ const CanvasObjectComponent: React.FC<{ object: CanvasObject; isSelected: boolea
             const text = object as CanvasObjectText;
             // foreignObject is needed for text wrapping.
             return (
-                <foreignObject x={text.pos.x} y={text.pos.y} width={text.width} height={text.height} data-object-id={text.id} onMouseDown={handleMouseDown} style={{ cursor: objectCursor, overflow: 'visible' }}>
+                <foreignObject x={text.pos.x} y={text.pos.y} width={text.width} height={text.height} data-object-id={text.id} onMouseDown={handleMouseDown} style={{ cursor: objectCursor, overflow: 'visible' }} className={fadeClasses}>
                     <div
                         style={{
                             fontSize: `${text.fontSize}px`,
@@ -167,7 +171,7 @@ const SelectionHandles: React.FC<{ object: CanvasObject, onMouseDown: (e: React.
     </>
 };
 
-const CanvasObjectLayer: React.FC<CanvasObjectLayerProps> = ({ objects, tempObject, selectedObjectIds, drawingMode, actions }) => {
+const CanvasObjectLayer: React.FC<CanvasObjectLayerProps> = ({ objects, tempObject, selectedObjectIds, drawingMode, actions, focusModeEnabled }) => {
     return (
         <g>
             <defs>
@@ -185,11 +189,11 @@ const CanvasObjectLayer: React.FC<CanvasObjectLayerProps> = ({ objects, tempObje
                 </marker>
             </defs>
             <g className="canvas-objects" style={{ pointerEvents: drawingMode === 'edit' || drawingMode === null ? 'auto' : 'none' }}>
-                {objects.map(obj => <CanvasObjectComponent key={obj.id} object={obj} isSelected={selectedObjectIds.has(obj.id)} drawingMode={drawingMode} actions={actions} />)}
+                {objects.map(obj => <CanvasObjectComponent key={obj.id} object={obj} isSelected={selectedObjectIds.has(obj.id)} drawingMode={drawingMode} actions={actions} focusModeEnabled={focusModeEnabled} />)}
             </g>
             {tempObject && (
                 <g className="canvas-temp-object" style={{ pointerEvents: 'none' }}>
-                    <CanvasObjectComponent object={tempObject} isSelected={false} drawingMode={drawingMode} actions={actions}/>
+                    <CanvasObjectComponent object={tempObject} isSelected={false} drawingMode={drawingMode} actions={actions} focusModeEnabled={focusModeEnabled} />
                 </g>
             )}
             {drawingMode === 'edit' && selectedObjectIds.size > 0 && (

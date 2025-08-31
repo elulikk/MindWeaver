@@ -6,6 +6,8 @@ import { iconRegistry, IconName, nonOutlineIcons, multiColorIcons, customViewBox
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   icon: IconName;
+  // FIX: Add optional 'title' prop to fix TypeScript error in ProjectExplorer.tsx
+  title?: string;
 }
 
 export const Icon = React.memo<IconProps>(({ icon, className, ...props }) => {

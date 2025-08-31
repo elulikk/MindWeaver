@@ -54,6 +54,7 @@ export const useMindMapStore = create<MindMapState>()((set, get) => {
         panelStates: {
             explorer: { collapsed: true, pinned: true },
         },
+        similarProjectGroups: [],
 
         // Log Panel State
         isLogPanelOpen: false,
